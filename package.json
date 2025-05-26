@@ -1,0 +1,10 @@
+{
+  "name": "cipher-puzzle-game",
+  "version": "1.0.0",
+  "scripts": {
+    "setup": "node setup.js",
+    "start": "node backend/src/server.js"
+  },
+  "dependencies": {
+  }
+}
