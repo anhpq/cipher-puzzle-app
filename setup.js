@@ -30,7 +30,7 @@ const files = [
   "backend/.env",
   "backend/README.md",
   "frontend/src/App.jsx",
-  "frontend/src/index.js",
+  "frontend/src/index.jsx",
   "frontend/README.md",
   "database/schema.sql",
   "database/seed.sql",
