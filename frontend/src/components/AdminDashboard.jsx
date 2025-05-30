@@ -1,216 +1,137 @@
-// frontend/src/components/AdminDashboard.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
-  Box,
-  Heading,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Button,
-  Spinner,
-  Alert,
-  AlertIcon,
-  Input,
-  FormControl,
-  FormLabel,
-  VStack
-} from "@chakra-ui/react";
-import axios from "axios";
-
-// Cấu hình header để gửi x-admin-secret (lấy từ biến môi trường VITE_ADMIN_PASSWORD)
-const config = {
-  headers: {
-    "x-admin-secret": import.meta.env.VITE_ADMIN_PASSWORD,
-  },
-};
+    Box,
+    Heading,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+    Button,
+    Spinner,
+    Alert,
+    AlertIcon,
+    Tabs,
+    TabList,
+    TabPanels,
+    Tab,
+    TabPanel
+} from '@chakra-ui/react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
-  /* --- STAGES --- */
-  const [stages, setStages] = useState([]);
-  const [loadingStages, setLoadingStages] = useState(false);
-  const [errorStages, setErrorStages] = useState("");
-  const [newStage, setNewStage] = useState({
-    stage_number: "",
-    stage_name: "",
-    description: "",
-    open_code: "",
-    location_image: "",
-  });
+    const [stages, setStages] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-  const fetchStages = async () => {
-    setLoadingStages(true);
-    try {
-      const response = await axios.get("http://localhost:5000/api/admin/stages", config);
-      setStages(response.data);
-    } catch (err) {
-      setErrorStages(err.response?.data?.error || "Error fetching stages");
-    } finally {
-      setLoadingStages(false);
-    }
-  };
+    // Cấu hình để gửi cookie phiên (session cookie)
+    const config = { withCredentials: true };
 
-  useEffect(() => {
-    fetchStages();
-  }, []);
+    // Hàm load dữ liệu stages từ backend
+    const fetchStages = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get('http://localhost:5000/api/admin/stages', config);
+            setStages(response.data);
+        } catch (err) {
+            setError(err.response?.data?.error || 'Error fetching stages.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handleNewStageChange = (e) => {
-    setNewStage({ ...newStage, [e.target.name]: e.target.value });
-  };
+    useEffect(() => {
+        fetchStages();
+    }, []);
 
-  const handleAddStage = async () => {
-    try {
-      const response = await axios.post("http://localhost:5000/api/admin/stages", newStage, config);
-      setStages([...stages, response.data]);
-      setNewStage({
-        stage_number: "",
-        stage_name: "",
-        description: "",
-        open_code: "",
-        location_image: "",
-      });
-    } catch (err) {
-      setErrorStages(err.response?.data?.error || "Error adding stage");
-    }
-  };
+    // Hàm logout: gọi endpoint logout và điều hướng về trang login
+    const handleLogout = async () => {
+        try {
+            await axios.post('http://localhost:5000/api/logout', {}, config);
+            // Nếu bạn đang sử dụng một flag trong localStorage cho client-side route protection, hãy xoá nó
+            localStorage.removeItem('adminLoggedIn');
+            navigate('/');
+        } catch (err) {
+            console.error('Logout error:', err);
+        }
+    };
 
-  /* --- CÁC TAB KHÁC --- */
-  // Phần quản lý Questions, Team Routes, Assignments có thể triển khai tương tự.
-  // Ở đây chỉ đưa vào placeholder
-
-  return (
-    <Box p={4}>
-      <Heading mb={4}>Admin Dashboard</Heading>
-      <Tabs variant="enclosed" isFitted>
-        <TabList mb="1em">
-          <Tab>Stages</Tab>
-          <Tab>Questions</Tab>
-          <Tab>Team Routes</Tab>
-          <Tab>Assignments</Tab>
-        </TabList>
-        <TabPanels>
-          {/* STAGES TAB */}
-          <TabPanel>
-            <Box mb={4}>
-              <Heading size="md" mb={2}>Add New Stage</Heading>
-              <VStack spacing={3} align="stretch">
-                <FormControl>
-                  <FormLabel>Stage Number</FormLabel>
-                  <Input
-                    type="number"
-                    name="stage_number"
-                    value={newStage.stage_number}
-                    onChange={handleNewStageChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Stage Name</FormLabel>
-                  <Input
-                    type="text"
-                    name="stage_name"
-                    value={newStage.stage_name}
-                    onChange={handleNewStageChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Description</FormLabel>
-                  <Input
-                    type="text"
-                    name="description"
-                    value={newStage.description}
-                    onChange={handleNewStageChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Open Code</FormLabel>
-                  <Input
-                    type="text"
-                    name="open_code"
-                    value={newStage.open_code}
-                    onChange={handleNewStageChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Location Image (Base64)</FormLabel>
-                  <Input
-                    type="text"
-                    name="location_image"
-                    value={newStage.location_image}
-                    onChange={handleNewStageChange}
-                  />
-                </FormControl>
-                <Button colorScheme="blue" onClick={handleAddStage}>
-                  Add Stage
-                </Button>
-              </VStack>
-            </Box>
-            {loadingStages ? (
-              <Spinner />
-            ) : errorStages ? (
-              <Alert status="error">
-                <AlertIcon />
-                {errorStages}
-              </Alert>
-            ) : (
-              <Table variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th>ID</Th>
-                    <Th>Stage Number</Th>
-                    <Th>Stage Name</Th>
-                    <Th>Description</Th>
-                    <Th>Open Code</Th>
-                    <Th>Actions</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {stages.map((stage) => (
-                    <Tr key={stage.stage_id}>
-                      <Td>{stage.stage_id}</Td>
-                      <Td>{stage.stage_number}</Td>
-                      <Td>{stage.stage_name}</Td>
-                      <Td>{stage.description}</Td>
-                      <Td>{stage.open_code}</Td>
-                      <Td>
-                        <Button size="sm" colorScheme="blue" mr={2}>
-                          Edit
-                        </Button>
-                        <Button size="sm" colorScheme="red">
-                          Delete
-                        </Button>
-                      </Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            )}
-          </TabPanel>
-          
-          {/* QUESTIONS TAB */}
-          <TabPanel>
-            <Box>Questions management section – triển khai tương tự như Stages.</Box>
-          </TabPanel>
-          
-          {/* TEAM ROUTES TAB */}
-          <TabPanel>
-            <Box>Team Routes management section – triển khai theo yêu cầu của dự án.</Box>
-          </TabPanel>
-          
-          {/* ASSIGNMENTS TAB */}
-          <TabPanel>
-            <Box>Assignments management section – chỉ hiển thị, dữ liệu được cập nhật tự động.</Box>
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-    </Box>
-  );
+    return (
+        <Box p={4}>
+            <Heading mb={4}>Admin Dashboard</Heading>
+            <Button colorScheme="red" mb={4} onClick={handleLogout}>
+                Logout
+            </Button>
+            <Tabs variant="enclosed" isFitted>
+                <TabList mb="1em">
+                    <Tab>Stages</Tab>
+                    <Tab>Questions</Tab>
+                    <Tab>Team Routes</Tab>
+                    <Tab>Assignments</Tab>
+                </TabList>
+                <TabPanels>
+                    {/* Tab Stages */}
+                    <TabPanel>
+                        {loading ? (
+                            <Spinner />
+                        ) : error ? (
+                            <Alert status="error">
+                                <AlertIcon />
+                                {error}
+                            </Alert>
+                        ) : (
+                            <Table variant="simple">
+                                <Thead>
+                                    <Tr>
+                                        <Th>ID</Th>
+                                        <Th>Stage Number</Th>
+                                        <Th>Stage Name</Th>
+                                        <Th>Description</Th>
+                                        <Th>Open Code</Th>
+                                        <Th>Actions</Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {stages.map((stage) => (
+                                        <Tr key={stage.stage_id}>
+                                            <Td>{stage.stage_id}</Td>
+                                            <Td>{stage.stage_number}</Td>
+                                            <Td>{stage.stage_name}</Td>
+                                            <Td>{stage.description}</Td>
+                                            <Td>{stage.open_code}</Td>
+                                            <Td>
+                                                <Button size="sm" colorScheme="blue" mr={2}>
+                                                    Edit
+                                                </Button>
+                                                <Button size="sm" colorScheme="red">
+                                                    Delete
+                                                </Button>
+                                            </Td>
+                                        </Tr>
+                                    ))}
+                                </Tbody>
+                            </Table>
+                        )}
+                    </TabPanel>
+                    {/* Tab Questions */}
+                    <TabPanel>
+                        <Box>Questions management section – to be implemented similarly.</Box>
+                    </TabPanel>
+                    {/* Tab Team Routes */}
+                    <TabPanel>
+                        <Box>Team Routes management section – to be developed as needed.</Box>
+                    </TabPanel>
+                    {/* Tab Assignments */}
+                    <TabPanel>
+                        <Box>Assignments management section – read-only display.</Box>
+                    </TabPanel>
+                </TabPanels>
+            </Tabs>
+        </Box>
+    );
 };
 
 export default AdminDashboard;

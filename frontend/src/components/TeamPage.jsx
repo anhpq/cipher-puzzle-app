@@ -11,11 +11,12 @@ const TeamPage = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Call API to fetch the current puzzle assigned to the team.
+  const config = { withCredentials: true };
+
   const fetchCurrentPuzzle = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/team/current', { withCredentials: true });
+      const response = await axios.get('http://localhost:5000/api/team/current', config);
       setCurrentPuzzle(response.data);
     } catch (err) {
       setError(err.response?.data?.error || 'Error fetching current puzzle.');
@@ -28,23 +29,19 @@ const TeamPage = () => {
     fetchCurrentPuzzle();
   }, []);
 
-  // Handle the "open stage" submission
   const handleSubmitCode = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/team/submit', { code: inputCode }, { withCredentials: true });
-      // After a successful submission, update the puzzle or navigate to next stage
+      const response = await axios.post('http://localhost:5000/api/team/submit', { code: inputCode }, config);
       alert(response.data.message);
-      fetchCurrentPuzzle();
+      fetchCurrentPuzzle(); // load next puzzle if applicable
     } catch (err) {
       alert(err.response?.data?.error || 'Submission failed.');
     }
   };
 
-  // Logout for team (similar to admin logout)
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5000/api/logout', {}, { withCredentials: true });
-      // Remove team flag if using localStorage for client-side routing protection
+      await axios.post('http://localhost:5000/api/logout', {}, config);
       localStorage.removeItem('teamLoggedIn');
       navigate('/');
     } catch (err) {
@@ -61,7 +58,7 @@ const TeamPage = () => {
       {loading ? (
         <Spinner />
       ) : error ? (
-        <Alert status="error">
+        <Alert status="error" mb={4}>
           <AlertIcon />
           {error}
         </Alert>

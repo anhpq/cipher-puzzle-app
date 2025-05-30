@@ -1,6 +1,6 @@
 // frontend/src/components/Login.jsx
 import React, { useState } from 'react';
-import { Box, Button, Input, FormControl, FormLabel, Alert, AlertIcon } from '@chakra-ui/react';
+import { Box, Button, Input, FormControl, FormLabel, Alert, AlertIcon, Heading } from '@chakra-ui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,9 +19,11 @@ function Login() {
       );
 
       if (response.data.role === 'admin') {
+        localStorage.setItem('adminLoggedIn', 'true');
         navigate('/admin/dashboard');
       }
       else {
+        localStorage.setItem('teamLoggedIn', 'true');
         // Nếu đăng nhập thành công, chuyển hướng đến trang team
         navigate('/team');
       }
@@ -32,6 +34,7 @@ function Login() {
 
   return (
     <Box maxW="md" mx="auto" mt="10">
+      <Heading mb="6" textAlign="center">Welcome to the Game</Heading>
       <form onSubmit={handleSubmit}>
         <FormControl mb="4">
           <FormLabel>Username</FormLabel>
@@ -39,7 +42,7 @@ function Login() {
             type="text" 
             value={username} 
             onChange={e => setUsername(e.target.value)} 
-            placeholder="Enter your username or team name" />
+            placeholder="Enter your username" />
         </FormControl>
         <FormControl mb="4">
           <FormLabel>Password</FormLabel>

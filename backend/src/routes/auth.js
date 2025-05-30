@@ -18,7 +18,7 @@ router.post('/login', async (req, res) => {
   if (username.toLowerCase() === 'admin') {
     if (password === process.env.ADMIN_PASSWORD) {
       req.session.admin = true;
-      return res.json({ message: 'Admin login successful.' });
+      return res.json({ message: 'Admin login successful.', role: 'admin' });
     } else {
       return res.status(401).json({ error: 'Invalid admin credentials.' });
     }
@@ -37,13 +37,13 @@ router.post('/login', async (req, res) => {
     if (password === team.password) {
       req.session.team = true;
       req.session.teamId = team.team_id;
-      return res.json({ message: 'Team login successful.' });
+      return res.json({ message: 'Team login successful.', role: 'team' });
     } else {
-      return res.status(401).json({ error: 'Invalid team credentials.', role: 'admin' });
+      return res.status(401).json({ error: 'Invalid team credentials.' });
     }
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: 'Server error during team login.', role: 'teamteam' });
+    return res.status(500).json({ error: 'Server error during team login.' });
   }
 });
 
@@ -58,6 +58,16 @@ router.post('/logout', (req, res) => {
     res.clearCookie('connect.sid');
     return res.json({ message: 'Logged out successfully.' });
   });
+});
+
+router.get('/verify', (req, res) => {
+  if (req.session.admin) {
+    return res.json({ isAuthenticated: true, role: 'admin' });
+  } else if (req.session.team) {
+    return res.json({ isAuthenticated: true, role: 'team' });
+  } else {
+    return res.json({ isAuthenticated: false });
+  }
 });
 
 module.exports = router;
