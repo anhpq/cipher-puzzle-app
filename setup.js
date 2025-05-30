@@ -19,7 +19,6 @@ const directories = [
   "frontend/src/hooks",
   "frontend/src/context",
   "frontend/src/styles",
-  "frontend/public",
   "database/migrations",
   "docs"
 ];

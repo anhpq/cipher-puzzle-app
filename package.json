@@ -5,13 +5,10 @@
   "scripts": {
     "setup": "node setup.js",
     "db:setup": "powershell -ExecutionPolicy Bypass -File ./database/db-setup.ps1",
-    "start": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
+    "start": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "i:all": "concurrently \"npm i\" \"npm audit fix --force\" \"npm i --prefix backend\" \"npm audit fix --force --prefix backend\" \"npm i --prefix frontend\" \"npm audit fix --force --prefix frontend\""
   },
   "dependencies": {
-    "concurrently": "^8.2.0",
-    "multer": "^2.0.0"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.5.0"
+    "concurrently": "^8.2.0"
   }
 }
