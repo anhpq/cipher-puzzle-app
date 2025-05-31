@@ -25,6 +25,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  Image
 } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -35,10 +36,12 @@ const QuestionsTab = ({ config }) => {
   const [newQuestion, setNewQuestion] = useState({
     stage_id: "",
     question_text: "",
-    answer: "",
-    hint1: "",
-    hint2: ""
+    answer: ""
   });
+  
+  // State để lưu file cho hint1 và hint2
+  const [newHint1, setNewHint1] = useState(null);
+  const [newHint2, setNewHint2] = useState(null);
 
   // Modal cho chỉnh sửa câu hỏi
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -46,10 +49,10 @@ const QuestionsTab = ({ config }) => {
   const [editQuestionData, setEditQuestionData] = useState({
     stage_id: "",
     question_text: "",
-    answer: "",
-    hint1: "",
-    hint2: ""
+    answer: ""
   });
+  const [editHint1, setEditHint1] = useState(null);
+  const [editHint2, setEditHint2] = useState(null);
 
   const fetchQuestions = async () => {
     setLoading(true);
@@ -71,17 +74,33 @@ const QuestionsTab = ({ config }) => {
     setNewQuestion({ ...newQuestion, [e.target.name]: e.target.value });
   };
 
+  const handleNewHint1Change = (e) => {
+    setNewHint1(e.target.files[0]);
+  };
+
+  const handleNewHint2Change = (e) => {
+    setNewHint2(e.target.files[0]);
+  };
+
+  // Thêm câu hỏi mới: Sử dụng FormData để gửi file upload
   const handleAddQuestion = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/admin/questions', newQuestion, config);
-      setQuestions([...questions, response.data]);
-      setNewQuestion({
-        stage_id: "",
-        question_text: "",
-        answer: "",
-        hint1: "",
-        hint2: ""
+      const formData = new FormData();
+      formData.append("stage_id", newQuestion.stage_id);
+      formData.append("question_text", newQuestion.question_text);
+      formData.append("answer", newQuestion.answer);
+      if(newHint1) formData.append("hint1", newHint1);
+      if(newHint2) formData.append("hint2", newHint2);
+      
+      const response = await axios.post('http://localhost:5000/api/admin/questions', formData, {
+        ...config,
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
+      setQuestions([...questions, response.data]);
+      // Reset form
+      setNewQuestion({ stage_id: "", question_text: "", answer: ""});
+      setNewHint1(null);
+      setNewHint2(null);
     } catch (err) {
       console.error("Error adding question:", err);
     }
@@ -89,7 +108,10 @@ const QuestionsTab = ({ config }) => {
 
   const handleEditClick = (question) => {
     setEditingQuestion(question);
+    // Set dữ liệu ban đầu cho form chỉnh sửa; nếu muốn cho phép upload lại file, bạn có thể để trống
     setEditQuestionData(question);
+    setEditHint1(null);
+    setEditHint2(null);
     onOpen();
   };
 
@@ -97,12 +119,28 @@ const QuestionsTab = ({ config }) => {
     setEditQuestionData({ ...editQuestionData, [e.target.name]: e.target.value });
   };
 
+  const handleEditHint1Change = (e) => {
+    setEditHint1(e.target.files[0]);
+  };
+
+  const handleEditHint2Change = (e) => {
+    setEditHint2(e.target.files[0]);
+  };
+
   const handleUpdateQuestion = async () => {
     try {
+      const formData = new FormData();
+      formData.append("stage_id", editQuestionData.stage_id);
+      formData.append("question_text", editQuestionData.question_text);
+      formData.append("answer", editQuestionData.answer);
+      // Chỉ append file nếu người dùng upload mới
+      if(editHint1) formData.append("hint1", editHint1);
+      if(editHint2) formData.append("hint2", editHint2);
+      
       const response = await axios.put(
         `http://localhost:5000/api/admin/questions/${editingQuestion.question_id}`,
-        editQuestionData,
-        config
+        formData,
+        { ...config, headers: { 'Content-Type': 'multipart/form-data' } }
       );
       const updatedQuestions = questions.map(q =>
         q.question_id === editingQuestion.question_id ? response.data : q
@@ -141,12 +179,12 @@ const QuestionsTab = ({ config }) => {
           <Input type="text" name="answer" value={newQuestion.answer} onChange={handleNewQuestionChange} />
         </FormControl>
         <FormControl>
-          <FormLabel>Hint 1</FormLabel>
-          <Input type="text" name="hint1" value={newQuestion.hint1} onChange={handleNewQuestionChange} />
+          <FormLabel>Hint 1 (Image)</FormLabel>
+          <Input type="file" accept="image/*" onChange={handleNewHint1Change} />
         </FormControl>
         <FormControl>
-          <FormLabel>Hint 2</FormLabel>
-          <Input type="text" name="hint2" value={newQuestion.hint2} onChange={handleNewQuestionChange} />
+          <FormLabel>Hint 2 (Image)</FormLabel>
+          <Input type="file" accept="image/*" onChange={handleNewHint2Change} />
         </FormControl>
         <Button colorScheme="blue" onClick={handleAddQuestion}>
           Add Question
@@ -180,8 +218,30 @@ const QuestionsTab = ({ config }) => {
                 <Td>{q.stage_id} ({q.stage_name})</Td>
                 <Td>{q.question_text}</Td>
                 <Td>{q.answer}</Td>
-                <Td>{q.hint1}</Td>
-                <Td>{q.hint2}</Td>
+                <Td>
+                  {q.hint1 ? (
+                    <Image 
+                      src={`data:image/png;base64,${q.hint1}`} 
+                      alt="Hint1" 
+                      boxSize="50px" 
+                      objectFit="cover" 
+                    />
+                  ) : (
+                    "No Image"
+                  )}
+                </Td>
+                <Td>
+                  {q.hint2 ? (
+                    <Image 
+                      src={`data:image/png;base64,${q.hint2}`} 
+                      alt="Hint2" 
+                      boxSize="50px" 
+                      objectFit="cover" 
+                    />
+                  ) : (
+                    "No Image"
+                  )}
+                </Td>
                 <Td>
                   <Button size="sm" colorScheme="blue" mr={2} onClick={() => handleEditClick(q)}>
                     Edit
@@ -212,12 +272,6 @@ const QuestionsTab = ({ config }) => {
                   value={editQuestionData.stage_id}
                   onChange={handleEditChange}
                 />
-                {/* Bạn có thể hiển thị stage name được lấy từ backend nếu cần thông tin tham khảo */}
-                {editQuestionData.stage_name && (
-                  <Box fontSize="sm" color="gray.500" mt={1}>
-                    Stage Name: {editQuestionData.stage_name}
-                  </Box>
-                )}
               </FormControl>
               <FormControl>
                 <FormLabel>Question Text</FormLabel>
@@ -238,22 +292,34 @@ const QuestionsTab = ({ config }) => {
                 />
               </FormControl>
               <FormControl>
-                <FormLabel>Hint 1</FormLabel>
-                <Input
-                  type="text"
-                  name="hint1"
-                  value={editQuestionData.hint1}
-                  onChange={handleEditChange}
-                />
+                <FormLabel>Hint 1 (Image)</FormLabel>
+                <Input type="file" accept="image/*" onChange={handleEditHint1Change} />
+                {editingQuestion && editingQuestion.hint1 && !editHint1 && (
+                  <Box mt={2}>
+                    <Text fontSize="sm" color="gray.500">Current Hint 1:</Text>
+                    <Image 
+                      src={`data:image/png;base64,${editingQuestion.hint1}`} 
+                      alt="Current Hint1" 
+                      boxSize="50px" 
+                      objectFit="cover" 
+                    />
+                  </Box>
+                )}
               </FormControl>
               <FormControl>
-                <FormLabel>Hint 2</FormLabel>
-                <Input
-                  type="text"
-                  name="hint2"
-                  value={editQuestionData.hint2}
-                  onChange={handleEditChange}
-                />
+                <FormLabel>Hint 2 (Image)</FormLabel>
+                <Input type="file" accept="image/*" onChange={handleEditHint2Change} />
+                {editingQuestion && editingQuestion.hint2 && !editHint2 && (
+                  <Box mt={2}>
+                    <Text fontSize="sm" color="gray.500">Current Hint 2:</Text>
+                    <Image 
+                      src={`data:image/png;base64,${editingQuestion.hint2}`} 
+                      alt="Current Hint2" 
+                      boxSize="50px" 
+                      objectFit="cover" 
+                    />
+                  </Box>
+                )}
               </FormControl>
             </VStack>
           </ModalBody>
