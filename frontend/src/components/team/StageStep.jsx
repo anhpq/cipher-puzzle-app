@@ -1,5 +1,5 @@
 // StageStep.jsx (updated UI, hint logic, game completion)
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import {
   Box,
   Heading,
@@ -18,7 +18,6 @@ import axios from 'axios';
 
 const StageStep = ({
   stage,
-  teamId,
   isStageOne,
   onAdvance,
   config,
@@ -31,9 +30,14 @@ const StageStep = ({
   const [hintCountdown, setHintCountdown] = useState(null);
   const [hintData, setHintData] = useState({ hint1: null, hint2: null });
   const [hintTimers, setHintTimers] = useState({ hint1: 360, hint2: 720 });
+  const [hintEnabled, setHintEnabled] = useState({ hint1: false, hint2: false });
   const [totalTime, setTotalTime] = useState(null);
 
   const cardBg = useColorModeValue('gray.50', 'gray.700');
+
+  useEffect(() => {
+    fetchHintTimers();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -48,6 +52,31 @@ const StageStep = ({
     return () => clearInterval(interval);
   }, []);
 
+  const fetchHintTimers = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/team-progress/get-hint', {
+        ...config,
+        params: {
+          stage_id: stage.stageId,
+          question_id: stage.questionId
+        }
+      });
+      if (response.data.success) {
+        const elapsed = response.data.hint.elapsedSeconds || 0;
+        setHintTimers({
+          hint1: Math.max(360 - elapsed, 0),
+          hint2: Math.max(720 - elapsed, 0),
+        });
+        setHintEnabled({
+          hint1: elapsed >= 360,
+          hint2: elapsed >= 720
+        });
+      }
+
+    } catch (err) {
+    }
+  };
+
   const handleVerifyOpenCode = async () => {
     try {
       const response = await axios.post(
@@ -61,8 +90,8 @@ const StageStep = ({
       if (response.data.success) {
         setVerified(true);
         setSubmitMessage("Valid open code! Please enter your answer.");
-        if (isStageOne) {
-          await axios.put('http://localhost:5000/api/team-progress/start-time', config);
+        if (isStageOne && typeof onAdvance === "function") {
+          await axios.put('http://localhost:5000/api/team-progress/start-time', {}, config);
           if (typeof onAdvance === "function") onAdvance();
         }
       }
@@ -92,7 +121,7 @@ const StageStep = ({
     }
   };
 
-  const fetchHint = async (hintKey) => {
+  const fetchHint = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/team-progress/get-hint', {
         ...config,
@@ -101,12 +130,16 @@ const StageStep = ({
           question_id: stage.questionId
         }
       });
-      if (response.data.success && response.data.hint) {
-        setHintData(response.data.hint);
+      if (response.data.success) {
+        const available = response.data.hint || {};
+        setHintData({
+          hint1: available.hint1 || false,
+          hint2: available.hint2 || false
+        });
       } else {
         setSubmitMessage(response.data.message || "Hint not available yet.");
       }
-    } catch (error) {
+    } catch (err) {
       setSubmitMessage("Error fetching hint.");
     }
   };
@@ -178,18 +211,10 @@ const StageStep = ({
               Submit Answer
             </Button>
             <HStack spacing={4} justify="center">
-              <Button
-                onClick={() => fetchHint('hint1')}
-                colorScheme="orange"
-                isDisabled={hintTimers.hint1 > 0 || !!hintData.hint1 === false}
-              >
+              <Button onClick={() => fetchHint('hint1')} colorScheme="orange" isDisabled={!hintEnabled.hint1}>
                 Hint 1 ({hintTimers.hint1}s)
               </Button>
-              <Button
-                onClick={() => fetchHint('hint2')}
-                colorScheme="orange"
-                isDisabled={hintTimers.hint2 > 0 || !!hintData.hint2 === false}
-              >
+              <Button onClick={() => fetchHint('hint2')} colorScheme="orange" isDisabled={!hintEnabled.hint2}>
                 Hint 2 ({hintTimers.hint2}s)
               </Button>
             </HStack>

@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS team_routes (
     stage_id INTEGER NOT NULL,
     route_order INTEGER NOT NULL,
     completed BOOLEAN DEFAULT false,
+    start_at TIMESTAMP,
     completed_at TIMESTAMP,
     open_code_verified BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT NOW(),
