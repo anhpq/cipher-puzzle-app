@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS team_routes (
     route_order INTEGER NOT NULL,
     completed BOOLEAN DEFAULT false,
     completed_at TIMESTAMP,
+    open_code_verified BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT unique_team_route UNIQUE (team_id, route_order),
     CONSTRAINT fk_team
@@ -65,6 +66,7 @@ CREATE TABLE IF NOT EXISTS team_question_assignments (
     assigned_at TIMESTAMP DEFAULT NOW(),
     completed_at TIMESTAMP,
     attempts INTEGER DEFAULT 0,
+    last_attempt_at TIMESTAMP,
     CONSTRAINT fk_team_assignment
       FOREIGN KEY (team_id)
       REFERENCES teams(team_id)
