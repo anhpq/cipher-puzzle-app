@@ -1,3 +1,4 @@
+// frontend/src/components/QuestionsTab.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -164,7 +165,7 @@ const QuestionsTab = ({ config }) => {
           <Thead>
             <Tr>
               <Th>ID</Th>
-              <Th>Stage ID</Th>
+              <Th>Stage</Th>
               <Th>Question Text</Th>
               <Th>Answer</Th>
               <Th>Hint 1</Th>
@@ -176,7 +177,7 @@ const QuestionsTab = ({ config }) => {
             {questions.map((q) => (
               <Tr key={q.question_id}>
                 <Td>{q.question_id}</Td>
-                <Td>{q.stage_id}</Td>
+                <Td>{q.stage_id} ({q.stage_name})</Td>
                 <Td>{q.question_text}</Td>
                 <Td>{q.answer}</Td>
                 <Td>{q.hint1}</Td>
@@ -211,6 +212,12 @@ const QuestionsTab = ({ config }) => {
                   value={editQuestionData.stage_id}
                   onChange={handleEditChange}
                 />
+                {/* Bạn có thể hiển thị stage name được lấy từ backend nếu cần thông tin tham khảo */}
+                {editQuestionData.stage_name && (
+                  <Box fontSize="sm" color="gray.500" mt={1}>
+                    Stage Name: {editQuestionData.stage_name}
+                  </Box>
+                )}
               </FormControl>
               <FormControl>
                 <FormLabel>Question Text</FormLabel>

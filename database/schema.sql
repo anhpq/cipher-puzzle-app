@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS stages (
     stage_name VARCHAR(255) NOT NULL,
     description TEXT,
     open_code VARCHAR(255),
-    location_image TEXT,
+    location_image BYTEA,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS questions (
     stage_id INTEGER NOT NULL,
     question_text TEXT NOT NULL,
     answer VARCHAR(255) NOT NULL,
-    hint1 TEXT,
-    hint2 TEXT,
+    hint1 BYTEA,
+    hint2 BYTEA,
     created_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT fk_stage
       FOREIGN KEY (stage_id)
