@@ -64,6 +64,7 @@ const StagesTab = ({ config }) => {
     try {
       const response = await axios.get('http://localhost:5000/api/admin/stages', config);
       setStages(response.data);
+      console.log("Fetched stages:", response.data);
     } catch (err) {
       setError(err.response?.data?.error || "Error fetching stages");
     } finally {

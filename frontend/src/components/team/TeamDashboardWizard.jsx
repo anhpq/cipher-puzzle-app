@@ -16,6 +16,7 @@ import {
   Flex
 } from '@chakra-ui/react';
 import { CheckIcon, TimeIcon } from '@chakra-ui/icons';
+import { FaLocationDot } from "react-icons/fa6";
 import StageStep from './StageStep';
 import axios from 'axios';
 
@@ -56,6 +57,7 @@ const TeamDashboardWizard = ({ config, teamId, onAdvance }) => {
   }
 
   const currentStage = stages[activeStep];
+  console.log("Current Stage:", currentStage);
   const visibleStages = stages.filter((_, index) =>
     index === activeStep - 1 || index === activeStep || index === activeStep + 1
   );
@@ -64,21 +66,21 @@ const TeamDashboardWizard = ({ config, teamId, onAdvance }) => {
   const cardBg = useColorModeValue('white', 'gray.700');
 
   return (
-    <Box maxW="900px" mx="auto" p={6} bg={bg} borderRadius="lg" boxShadow="xl" mt={6}>
-      <Flex justify="center" mb={6}>
+    <Box maxW="900px" mx="auto" bg={bg} borderRadius="lg" boxShadow="xl" mt={6}>
+      <Flex justify="center" mb={6} p={8}>
         <Stepper index={activeStep} colorScheme="teal" size="lg" width="100%">
           {visibleStages.map((stage, index) => (
             <Step key={stage.stageId}>
               <StepIndicator>
                 <StepStatus
-                  complete={<Icon as={CheckIcon} color="green.500" />}
+                  complete={<Icon as={CheckIcon} color="blue.400" />}
                   incomplete={<Icon as={TimeIcon} color="gray.400" />}
-                  active={<Icon as={TimeIcon} color="blue.400" />}
+                  active={<Icon as={FaLocationDot} color="green.500" />}
                 />
               </StepIndicator>
               <Box flexShrink="0">
                 <StepTitle fontSize="sm">Stage {stage.stageNumber}</StepTitle>
-                <StepDescription fontSize="xs" color="gray.500">{stage.stageName}</StepDescription>
+                {/* <StepDescription fontSize="xs" color="gray.500">{stage.stageName}</StepDescription> */}
               </Box>
               <StepSeparator />
             </Step>

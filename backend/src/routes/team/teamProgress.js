@@ -248,10 +248,10 @@ router.get('/current-stages', teamAuth, async (req, res) => {
         tr.route_order AS "stageNumber",
         s.stage_name AS "stageName",
         s.description,
-        s.open_code AS "expectedOpenCode",
         q.question_text AS question,
         q.question_id AS "questionId",
-        tr.open_code_verified
+        tr.open_code_verified,
+        s.location_image
       FROM team_routes tr
       JOIN stages s ON tr.stage_id = s.stage_id
       JOIN questions q ON q.stage_id = s.stage_id
@@ -264,6 +264,14 @@ router.get('/current-stages', teamAuth, async (req, res) => {
       ORDER BY tr.route_order;
     `;
         const { rows } = await db.query(queryText, [teamId]);
+
+        // Convert mỗi cột location_image (nếu tồn tại) thành chuỗi Base64
+        rows.forEach(row => {
+            if (row.location_image) {
+                row.location_image = row.location_image.toString('base64');
+            }
+        });
+        
         return res.json(rows);
     } catch (error) {
         console.error("Error fetching current stages:", error);

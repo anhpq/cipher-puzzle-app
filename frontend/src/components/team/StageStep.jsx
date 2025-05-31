@@ -1,5 +1,5 @@
 // StageStep.jsx (updated UI, hint logic, game completion)
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Heading,
@@ -172,12 +172,12 @@ const StageStep = ({
     <Fade in>
       <Box p={6} bg={cardBg} borderRadius="lg" boxShadow="md" textAlign="center" mb={6}>
         <Heading size="lg" mb={4} color="purple.600">
-          Stage {stage.stageNumber} - {stage.stageName}
+          Stage {stage.stageNumber}
         </Heading>
 
-        <Text mb={4} fontSize="md" color="gray.600">
+        {/* <Text mb={4} fontSize="md" color="gray.600">
           {stage.description}
-        </Text>
+        </Text> */}
 
         {!verified ? (
           <VStack spacing={4}>
@@ -196,6 +196,10 @@ const StageStep = ({
                 <AlertIcon /> {submitMessage}
               </Alert>
             )}
+            <Box mt={4}>
+              <Text fontSize="large" mb={4} color="purple.600">Find the location</Text>
+              <Image src={`data:image/png;base64,${stage.location_image}`} maxW="400px" mx="auto" />
+            </Box>
           </VStack>
         ) : isFinalStage ? (
           <Alert status="success" mt={4} borderRadius="md">
