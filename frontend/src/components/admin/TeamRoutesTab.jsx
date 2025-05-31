@@ -1,3 +1,4 @@
+// frontend/src/components/TeamRoutesTab.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -15,7 +16,6 @@ import {
   Input,
   FormControl,
   FormLabel,
-  VStack,
   useDisclosure,
   Modal,
   ModalOverlay,
@@ -24,82 +24,94 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  Text,
 } from '@chakra-ui/react';
 import axios from 'axios';
 
 const TeamRoutesTab = ({ config }) => {
-  const [routes, setRoutes] = useState([]);
+  // State lưu trữ dữ liệu aggregated trả về từ endpoint GET /aggregate
+  const [groupedRoutes, setGroupedRoutes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Modal cho chỉnh sửa team route
+  // State và modal cho chức năng chỉnh sửa aggregated team route
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [editingRoute, setEditingRoute] = useState(null);
-  const [editRouteData, setEditRouteData] = useState({
-    team_id: "",
-    stage_id: "",
-    route_order: ""
-  });
+  const [editingTeamRoute, setEditingTeamRoute] = useState(null);
+  const [editRouteString, setEditRouteString] = useState("");
 
-  const fetchTeamRoutes = async () => {
+  // Gọi API để lấy danh sách team route đã được grouped từ backend
+  const fetchAggregatedRoutes = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/admin/team-routes', config);
-      setRoutes(response.data);
+      const response = await axios.get('http://localhost:5000/api/admin/team-routes/aggregate', config);
+      // Endpoint trả về dữ liệu dạng:
+      // [
+      //   { team_id: "1", routes: [ { team_route_id, team_id, stage_id, route_order, stage_name }, ... ] },
+      //   { team_id: "2", routes: [ ... ] },
+      //   ...
+      // ]
+      setGroupedRoutes(response.data);
     } catch (err) {
-      setError(err.response?.data?.error || "Error fetching team routes");
+      setError(err.response?.data?.error || "Error fetching aggregated team routes");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTeamRoutes();
+    fetchAggregatedRoutes();
   }, []);
 
-  const handleEditClick = (route) => {
-    setEditingRoute(route);
-    setEditRouteData(route);
+  // Khi nhấn nút Edit cho 1 team, mở modal và chuyển các stage_id thành chuỗi (ví dụ "1, 2, 3")
+  const handleEditClick = (teamAggregate) => {
+    setEditingTeamRoute(teamAggregate);
+    const routeStr = teamAggregate.routes.map((r) => r.stage_id).join(", ");
+    setEditRouteString(routeStr);
     onOpen();
   };
 
   const handleEditChange = (e) => {
-    setEditRouteData({ ...editRouteData, [e.target.name]: e.target.value });
+    setEditRouteString(e.target.value);
   };
 
-  const handleUpdateRoute = async () => {
+  // Khi cập nhật, chuyển chuỗi nhập vào thành mảng số sau đó gọi API PUT aggregate endpoint
+  const handleUpdateTeamRoute = async () => {
+    const routeArray = editRouteString
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s !== "")
+      .map(Number);
     try {
-      const response = await axios.put(
-        `http://localhost:5000/api/admin/team-routes/${editingRoute.team_route_id}`,
-        editRouteData,
+      // PUT /api/admin/team-routes/aggregate/:team_id với body { routes: routeArray }
+      await axios.put(
+        `http://localhost:5000/api/admin/team-routes/aggregate/${editingTeamRoute.team_id}`,
+        { routes: routeArray },
         config
       );
-      const updatedRoutes = routes.map(r =>
-        r.team_route_id === editingRoute.team_route_id ? response.data : r
-      );
-      setRoutes(updatedRoutes);
+      fetchAggregatedRoutes();
       onClose();
     } catch (err) {
-      console.error("Error updating team route:", err);
+      console.error("Error updating aggregated team route:", err);
     }
   };
 
-  const handleDeleteRoute = async (routeId) => {
+  const handleDeleteTeamRoute = async (team_id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/admin/team-routes/${routeId}`, config);
-      setRoutes(routes.filter(r => r.team_route_id !== routeId));
+      // DELETE /api/admin/team-routes/aggregate/:team_id
+      await axios.delete(`http://localhost:5000/api/admin/team-routes/aggregate/${team_id}`, config);
+      fetchAggregatedRoutes();
     } catch (err) {
-      console.error("Error deleting team route:", err);
+      console.error("Error deleting aggregated team route:", err);
     }
   };
 
   return (
     <Box>
-      <Heading size="md" mb={2}>Team Routes Management</Heading>
+      <Heading size="md" mb={2}>Team Routes Management (Aggregated)</Heading>
       {loading ? (
         <Spinner />
       ) : error ? (
-        <Alert status="error">
+        <Alert status="error" mb={4}>
           <AlertIcon />
           {error}
         </Alert>
@@ -107,25 +119,36 @@ const TeamRoutesTab = ({ config }) => {
         <Table variant="simple">
           <Thead>
             <Tr>
-              <Th>ID</Th>
               <Th>Team ID</Th>
-              <Th>Stage ID</Th>
-              <Th>Route Order</Th>
+              <Th>Route</Th>
               <Th>Actions</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {routes.map((r) => (
-              <Tr key={r.team_route_id}>
-                <Td>{r.team_route_id}</Td>
-                <Td>{r.team_id}</Td>
-                <Td>{r.stage_id}</Td>
-                <Td>{r.route_order}</Td>
+            {groupedRoutes.map((team) => (
+              <Tr key={team.team_id}>
+                <Td>{team.team_id}</Td>
                 <Td>
-                  <Button size="sm" colorScheme="blue" mr={2} onClick={() => handleEditClick(r)}>
+                  {team.routes.map((r, index) => (
+                    <span key={index}>
+                      {r.stage_id} - ({r.stage_name})<br />
+                    </span>
+                  ))}
+                </Td>
+                <Td>
+                  <Button
+                    size="sm"
+                    colorScheme="blue"
+                    mr={2}
+                    onClick={() => handleEditClick(team)}
+                  >
                     Edit
                   </Button>
-                  <Button size="sm" colorScheme="red" onClick={() => handleDeleteRoute(r.team_route_id)}>
+                  <Button
+                    size="sm"
+                    colorScheme="red"
+                    onClick={() => handleDeleteTeamRoute(team.team_id)}
+                  >
                     Delete
                   </Button>
                 </Td>
@@ -135,45 +158,27 @@ const TeamRoutesTab = ({ config }) => {
         </Table>
       )}
 
-      {/* Modal chỉnh sửa Team Route */}
+      {/* Modal chỉnh sửa Aggregated Team Route */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Team Route</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <VStack spacing={3}>
-              <FormControl>
-                <FormLabel>Team ID</FormLabel>
-                <Input
-                  type="number"
-                  name="team_id"
-                  value={editRouteData.team_id}
-                  onChange={handleEditChange}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Stage ID</FormLabel>
-                <Input
-                  type="number"
-                  name="stage_id"
-                  value={editRouteData.stage_id}
-                  onChange={handleEditChange}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Route Order</FormLabel>
-                <Input
-                  type="number"
-                  name="route_order"
-                  value={editRouteData.route_order}
-                  onChange={handleEditChange}
-                />
-              </FormControl>
-            </VStack>
+            <FormControl>
+              <FormLabel>Team ID</FormLabel>
+              <Input type="text" value={editingTeamRoute ? editingTeamRoute.team_id : ""} readOnly />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Route (Comma separated Stage IDs)</FormLabel>
+              <Input type="text" value={editRouteString} onChange={handleEditChange} />
+            </FormControl>
+            <Text mt={2} fontSize="sm" color="gray.500">
+              (The stage names will be updated automatically based on your configuration.)
+            </Text>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleUpdateRoute}>
+            <Button colorScheme="blue" mr={3} onClick={handleUpdateTeamRoute}>
               Save
             </Button>
             <Button variant="ghost" onClick={onClose}>

@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
+
 const app = express();
 
 // Middleware: enable CORS and JSON body parsing
@@ -25,6 +26,9 @@ app.use('/api', authRoutes);
 
 const adminRoutes = require('./routes/admin');
 app.use('/api/admin', adminRoutes);
+
+const teamRoutesRouter = require('./routes/teamRoutes');
+app.use('/api/admin/team-routes', teamRoutesRouter);
 
 app.get('/', (req, res) => {
   res.send('Cipher Puzzle Game API is running!');
