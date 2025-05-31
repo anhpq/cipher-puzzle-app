@@ -60,8 +60,6 @@ const TeamDashboardWizard = ({ config, teamId, onAdvance }) => {
     index === activeStep - 1 || index === activeStep || index === activeStep + 1
   );
 
-  console.log("currentStage", currentStage);
-
   const bg = useColorModeValue('gray.50', 'gray.800');
   const cardBg = useColorModeValue('white', 'gray.700');
 

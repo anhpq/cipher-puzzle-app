@@ -18,6 +18,7 @@ import axios from 'axios';
 
 const StageStep = ({
   stage,
+  teamId,
   isStageOne,
   onAdvance,
   config,
@@ -41,11 +42,18 @@ const StageStep = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setHintTimers(prev => {
-        const updated = { ...prev };
-        Object.keys(updated).forEach(k => {
-          if (updated[k] > 0) updated[k]--;
-        });
+      setHintTimers(prevTimers => {
+        const updated = { ...prevTimers };
+        if (updated.hint1 > 0) updated.hint1--;
+        if (updated.hint2 > 0) updated.hint2--;
+
+        if (updated.hint1 === 0) {
+          setHintEnabled(prev => ({ ...prev, hint1: true }));
+        }
+        if (updated.hint2 === 0) {
+          setHintEnabled(prev => ({ ...prev, hint2: true }));
+        }
+
         return updated;
       });
     }, 1000);
@@ -212,10 +220,10 @@ const StageStep = ({
             </Button>
             <HStack spacing={4} justify="center">
               <Button onClick={() => fetchHint('hint1')} colorScheme="orange" isDisabled={!hintEnabled.hint1}>
-                Hint 1 ({hintTimers.hint1}s)
+                Hint 1 {hintTimers.hint1 > 0 ? `(${hintTimers.hint1}s)` : ""}
               </Button>
               <Button onClick={() => fetchHint('hint2')} colorScheme="orange" isDisabled={!hintEnabled.hint2}>
-                Hint 2 ({hintTimers.hint2}s)
+                Hint 2 {hintTimers.hint2 > 0 ? `(${hintTimers.hint2}s)` : ""}
               </Button>
             </HStack>
             {(hintData.hint1 || hintData.hint2) && (
