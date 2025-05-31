@@ -1,23 +1,36 @@
-// frontend/src/components/TeamDashboardWizard.jsx
+// TeamDashboardWizard.jsx (enhanced UI + animation)
 import React, { useState, useEffect } from 'react';
-import StepWizard from 'react-step-wizard';
-import { Box, Spinner } from '@chakra-ui/react';
+import {
+  Box,
+  Spinner,
+  Stepper,
+  Step,
+  StepIndicator,
+  StepStatus,
+  StepTitle,
+  StepDescription,
+  StepSeparator,
+  Icon,
+  useColorModeValue,
+  Fade,
+  Flex
+} from '@chakra-ui/react';
+import { CheckIcon, TimeIcon } from '@chakra-ui/icons';
 import StageStep from './StageStep';
 import axios from 'axios';
 
-const TeamDashboardWizard = ({ config, teamId }) => {
+const TeamDashboardWizard = ({ config, teamId, onAdvance }) => {
   const [stages, setStages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeStep, setActiveStep] = useState(0);
+  const [animating, setAnimating] = useState(false);
 
-  // Lấy danh sách stage hiện hành từ backend,
-  // không cần truyền teamId trong query vì backend sử dụng session.
   const fetchStages = async () => {
     try {
-      const response = await axios.get(
-        'http://localhost:5000/api/team/current-stages',
-        config
-      );
+      const response = await axios.get('http://localhost:5000/api/team-progress/current-stages', config);
       setStages(response.data);
+      const index = response.data.findIndex(s => s.open_code_verified === true);
+      setActiveStep(index === -1 ? 0 : index);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching stages:", error);
@@ -29,34 +42,62 @@ const TeamDashboardWizard = ({ config, teamId }) => {
     fetchStages();
   }, []);
 
-  const handleAdvance = () => {
-    console.log("Advancing stage for team (from session):", teamId);
-    // Bạn có thể tích hợp thêm các API cập nhật trạng thái nếu cần.
+  const handleAdvance = async () => {
+    if (typeof onAdvance === 'function') {
+      setAnimating(true);
+      await onAdvance();
+      await fetchStages();
+      setTimeout(() => setAnimating(false), 300); // delay for fade effect
+    }
   };
 
   if (loading) {
-    return <Spinner />;
+    return <Spinner size="xl" mt={10} />;
   }
 
+  const currentStage = stages[activeStep];
+  const visibleStages = stages.filter((_, index) =>
+    index === activeStep - 1 || index === activeStep || index === activeStep + 1
+  );
+
+  const bg = useColorModeValue('gray.50', 'gray.800');
+  const cardBg = useColorModeValue('white', 'gray.700');
+
   return (
-    <Box>
-      <StepWizard>
-        {stages.map((stage, index) => (
+    <Box maxW="900px" mx="auto" p={6} bg={bg} borderRadius="lg" boxShadow="xl" mt={6}>
+      <Flex justify="center" mb={6}>
+        <Stepper index={activeStep} colorScheme="teal" size="lg" width="100%">
+          {visibleStages.map((stage, index) => (
+            <Step key={stage.stageId}>
+              <StepIndicator>
+                <StepStatus
+                  complete={<Icon as={CheckIcon} color="green.500" />}
+                  incomplete={<Icon as={TimeIcon} color="gray.400" />}
+                  active={<Icon as={TimeIcon} color="blue.400" />}
+                />
+              </StepIndicator>
+              <Box flexShrink="0">
+                <StepTitle fontSize="sm">Stage {stage.stageNumber}</StepTitle>
+                <StepDescription fontSize="xs" color="gray.500">{stage.stageName}</StepDescription>
+              </Box>
+              <StepSeparator />
+            </Step>
+          ))}
+        </Stepper>
+      </Flex>
+
+      <Fade in={!animating} key={currentStage.stageId}>
+        <Box p={6} bg={cardBg} borderRadius="md" boxShadow="md">
           <StageStep
-            key={stage.stageId}
-            stage={stage}
-            teamId={teamId}  // Nếu cần hiển thị hoặc sử dụng teamId trên client, bạn vẫn có thể truyền qua props.
-            isStageOne={index === 0}
-            recordStartTime={() => {
-              console.log("Record start time for team (from session):", teamId);
-            }}
+            stage={currentStage}
+            teamId={teamId}
+            isStageOne={activeStep === 0}
             onAdvance={handleAdvance}
             config={config}
-            // Sử dụng trường open_code_verified từ API để xác định trạng thái đã xác thực.
-            initialVerified={stage.open_code_verified}
+            initialVerified={currentStage.open_code_verified}
           />
-        ))}
-      </StepWizard>
+        </Box>
+      </Fade>
     </Box>
   );
 };

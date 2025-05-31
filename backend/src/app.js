@@ -30,7 +30,6 @@ app.use('/api/admin/assignments', assignmentRoutes);
 const supportRouter = require('./routes/admin/support');
 app.use('/api/admin/support', supportRouter);
 
-
 const reportsRouter = require('./routes/admin/reports');
 app.use('/api/admin/reports', reportsRouter);
 
@@ -47,8 +46,16 @@ const teamRoutesRouter = require('./routes/admin/teamRoutes');
 app.use('/api/admin/team-routes', teamRoutesRouter);
 
 
+
+
 const teamProgressRouter = require('./routes/team/teamProgress');
-app.use('/api/team', teamProgressRouter);
+app.use('/api/team-progress', teamProgressRouter);
+
+const teamInfoRouter = require('./routes/team/teamInfo');
+app.use('/api/team-info', teamInfoRouter);
+
+
+
 
 app.get('/', (req, res) => {
   res.send('Cipher Puzzle Game API is running!');

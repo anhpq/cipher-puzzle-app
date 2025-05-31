@@ -1,4 +1,4 @@
-// frontend/src/components/StageStep.jsx
+// StageStep.jsx (updated UI, hint logic, game completion)
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -9,6 +9,10 @@ import {
   VStack,
   Alert,
   AlertIcon,
+  useColorModeValue,
+  Fade,
+  Image,
+  HStack
 } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -16,43 +20,39 @@ const StageStep = ({
   stage,
   teamId,
   isStageOne,
-  recordStartTime,
   onAdvance,
-  wizardMethods,
   config,
   initialVerified = false,
 }) => {
-  // Use open_code_verified field from backend for initial state.
   const [verified, setVerified] = useState(initialVerified);
   const [openCodeInput, setOpenCodeInput] = useState("");
   const [answerInput, setAnswerInput] = useState("");
   const [submitMessage, setSubmitMessage] = useState("");
   const [hintCountdown, setHintCountdown] = useState(null);
-  const [waitingRemaining, setWaitingRemaining] = useState(0);
+  const [hintData, setHintData] = useState({ hint1: null, hint2: null });
+  const [hintTimers, setHintTimers] = useState({ hint1: 360, hint2: 720 });
+  const [totalTime, setTotalTime] = useState(null);
 
-  // Timer for hint countdown (if provided by backend)
+  const cardBg = useColorModeValue('gray.50', 'gray.700');
+
   useEffect(() => {
-    let timer;
-    if (hintCountdown > 0) {
-      timer = setInterval(() => {
-        setHintCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
+    const interval = setInterval(() => {
+      setHintTimers(prev => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach(k => {
+          if (updated[k] > 0) updated[k]--;
         });
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [hintCountdown]);
+        return updated;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleVerifyOpenCode = async () => {
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/team/verify-open-code',
+        'http://localhost:5000/api/team-progress/verify-open-code',
         {
-          team_id: teamId,
           stage_id: stage.stageId,
           open_code: openCodeInput,
         },
@@ -60,13 +60,10 @@ const StageStep = ({
       );
       if (response.data.success) {
         setVerified(true);
-        setSubmitMessage("Valid open code! Please enter your answer for the question.");
+        setSubmitMessage("Valid open code! Please enter your answer.");
         if (isStageOne) {
-          await axios.put(
-            'http://localhost:5000/api/team/start-time',
-            { team_id: teamId },
-            config
-          );
+          await axios.put('http://localhost:5000/api/team-progress/start-time', config);
+          if (typeof onAdvance === "function") onAdvance();
         }
       }
     } catch (error) {
@@ -77,9 +74,8 @@ const StageStep = ({
   const handleSubmitAnswer = async () => {
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/team/submit-answer',
+        'http://localhost:5000/api/team-progress/submit-answer',
         {
-          team_id: teamId,
           stage_id: stage.stageId,
           question_id: stage.questionId,
           answer: answerInput,
@@ -87,78 +83,141 @@ const StageStep = ({
         config
       );
       if (response.data.success) {
+        await axios.put('http://localhost:5000/api/team-progress/advance-stage', { stage_id: stage.stageId }, config);
         setSubmitMessage("Correct answer! Stage completed.");
-        setHintCountdown(null);
-        wizardMethods.nextStep();
-        onAdvance();
+        if (typeof onAdvance === "function") onAdvance();
       }
     } catch (error) {
-      const data = error.response?.data;
-      if (data.hintCountdown !== undefined) {
-        setHintCountdown(data.hintCountdown);
-      }
-      if (data.message) {
-        setSubmitMessage(data.message);
-      } else {
-        setSubmitMessage("Wrong answer. Please try again later.");
-      }
+      setSubmitMessage(error.response?.data?.message || "Wrong answer.");
     }
   };
 
+  const fetchHint = async (hintKey) => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/team-progress/get-hint', {
+        ...config,
+        params: {
+          stage_id: stage.stageId,
+          question_id: stage.questionId
+        }
+      });
+      if (response.data.success && response.data.hint) {
+        setHintData(response.data.hint);
+      } else {
+        setSubmitMessage(response.data.message || "Hint not available yet.");
+      }
+    } catch (error) {
+      setSubmitMessage("Error fetching hint.");
+    }
+  };
+
+  const isFinalStage = stage.stageNumber === 7;
+
+  useEffect(() => {
+    if (isFinalStage && verified) {
+      axios.get('http://localhost:5000/api/team-progress/total-time', config)
+        .then(res => {
+          if (res.data && res.data.total_seconds != null) {
+            const minutes = Math.floor(res.data.total_seconds / 60);
+            const seconds = res.data.total_seconds % 60;
+            setTotalTime(`${minutes}m ${seconds}s`);
+          }
+        })
+        .catch(() => setTotalTime(null));
+    }
+  }, [isFinalStage, verified]);
+
   return (
-    <Box p={4}>
-      <Heading size="lg" mb={4}>
-        Stage {stage.stageNumber} - {stage.stageName}
-      </Heading>
-      <Text mb={4}>{stage.description}</Text>
-      {/* Show open code input if not verified */}
-      {!verified ? (
-        <VStack spacing={4}>
-          <Text>Enter the open code to start:</Text>
-          <Input
-            placeholder="Enter open code"
-            value={openCodeInput}
-            onChange={(e) => setOpenCodeInput(e.target.value)}
-          />
-          <Button onClick={handleVerifyOpenCode} colorScheme="blue">
-            Confirm open code
-          </Button>
-          {submitMessage && (
-            <Alert status={submitMessage.includes("Invalid") ? "error" : "success"}>
-              <AlertIcon />
-              {submitMessage}
-            </Alert>
-          )}
-        </VStack>
-      ) : (
-        <VStack spacing={4}>
-          <Text mb={4}>Question: {stage.question}</Text>
-          <Input
-            placeholder="Enter your answer"
-            value={answerInput}
-            onChange={(e) => setAnswerInput(e.target.value)}
-          />
-          <Button onClick={handleSubmitAnswer} colorScheme="green">
-            Submit Answer
-          </Button>
-          {waitingRemaining > 0 && (
-            <Text>Please wait {waitingRemaining} seconds before trying again.</Text>
-          )}
-          {hintCountdown > 0 && (
-            <Alert status="info">
-              <AlertIcon />
-              Hint will be displayed in {hintCountdown} seconds.
-            </Alert>
-          )}
-          {submitMessage && (
-            <Alert status={submitMessage.includes("Wrong") || submitMessage.includes("Error") ? "error" : "success"}>
-              <AlertIcon />
-              {submitMessage}
-            </Alert>
-          )}
-        </VStack>
-      )}
-    </Box>
+    <Fade in>
+      <Box p={6} bg={cardBg} borderRadius="lg" boxShadow="md" textAlign="center" mb={6}>
+        <Heading size="lg" mb={4} color="purple.600">
+          Stage {stage.stageNumber} - {stage.stageName}
+        </Heading>
+
+        <Text mb={4} fontSize="md" color="gray.600">
+          {stage.description}
+        </Text>
+
+        {!verified ? (
+          <VStack spacing={4}>
+            <Input
+              placeholder="Enter open code"
+              value={openCodeInput}
+              onChange={(e) => setOpenCodeInput(e.target.value)}
+              size="md"
+              variant="filled"
+            />
+            <Button onClick={handleVerifyOpenCode} colorScheme="teal">
+              Confirm Open Code
+            </Button>
+            {submitMessage && (
+              <Alert status="info" borderRadius="md">
+                <AlertIcon /> {submitMessage}
+              </Alert>
+            )}
+          </VStack>
+        ) : isFinalStage ? (
+          <Alert status="success" mt={4} borderRadius="md">
+            <AlertIcon />
+            🎉 Congratulations! You have completed all stages in {totalTime || '...'}.
+            Please return to the gathering point.
+          </Alert>
+        ) : (
+          <VStack spacing={4}>
+            <Text fontSize="md" fontWeight="semibold" color="blue.500">
+              Question: {stage.question}
+            </Text>
+            <Input
+              placeholder="Enter your answer"
+              value={answerInput}
+              onChange={(e) => setAnswerInput(e.target.value)}
+              size="md"
+              variant="filled"
+            />
+            <Button onClick={handleSubmitAnswer} colorScheme="green">
+              Submit Answer
+            </Button>
+            <HStack spacing={4} justify="center">
+              <Button
+                onClick={() => fetchHint('hint1')}
+                colorScheme="orange"
+                isDisabled={hintTimers.hint1 > 0 || !!hintData.hint1 === false}
+              >
+                Hint 1 ({hintTimers.hint1}s)
+              </Button>
+              <Button
+                onClick={() => fetchHint('hint2')}
+                colorScheme="orange"
+                isDisabled={hintTimers.hint2 > 0 || !!hintData.hint2 === false}
+              >
+                Hint 2 ({hintTimers.hint2}s)
+              </Button>
+            </HStack>
+            {(hintData.hint1 || hintData.hint2) && (
+              <Box mt={4}>
+                {hintData.hint1 && (
+                  <Box>
+                    <Text fontWeight="bold" mb={1}>Hint 1:</Text>
+                    <Image src={`data:image/png;base64,${hintData.hint1}`} maxW="200px" mx="auto" />
+                  </Box>
+                )}
+                {hintData.hint2 && (
+                  <Box mt={4}>
+                    <Text fontWeight="bold" mb={1}>Hint 2:</Text>
+                    <Image src={`data:image/png;base64,${hintData.hint2}`} maxW="200px" mx="auto" />
+                  </Box>
+                )}
+              </Box>
+            )}
+            {submitMessage && (
+              <Alert status="info" borderRadius="md">
+                <AlertIcon /> {submitMessage}
+              </Alert>
+            )}
+          </VStack>
+        )}
+      </Box>
+    </Fade>
   );
 };
 

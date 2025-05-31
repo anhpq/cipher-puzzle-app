@@ -29,7 +29,12 @@ router.put('/refresh', adminAuth, async (req, res) => {
     await db.query('BEGIN');
     // Giả sử refresh có nghĩa là reset số lần (attempts) cho stage hiện tại
     await db.query(
-      'UPDATE team_question_assignments SET attempts = 0 WHERE team_id = $1 AND stage_id = $2',
+      'UPDATE team_question_assignments SET attempts = 0, completed_at = NULL, last_attempt_at = NULL  WHERE team_id = $1 AND stage_id = $2',
+      [team_id, stage_id]
+    );
+    
+    await db.query(
+      'UPDATE team_routes SET completed = FALSE, completed_at = NULL WHERE team_id = $1 AND stage_id = $2',
       [team_id, stage_id]
     );
     // Nếu cần thiết, cũng có thể cập nhật lại thông tin trong bảng team_routes (nếu có cột liên quan đến trạng thái khác)
