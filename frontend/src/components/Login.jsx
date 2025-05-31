@@ -1,30 +1,30 @@
-// frontend/src/components/Login.jsx
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Button, Input, FormControl, FormLabel, Alert, AlertIcon, Heading } from '@chakra-ui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import AuthContext from '../context/AuthContext';
 
 function Login() {
-  const [username, setUsername]   = useState('');
-  const [password, setPassword]   = useState('');
-  const [error, setError]         = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { refreshAuth } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/login', 
+      const response = await axios.post(
+        'http://localhost:5000/api/login',
         { username, password },
-        { withCredentials: true }  // Đảm bảo cookie session được gửi đi
+        { withCredentials: true }
       );
 
+      await refreshAuth();
+
       if (response.data.role === 'admin') {
-        localStorage.setItem('adminLoggedIn', 'true');
         navigate('/admin/dashboard');
-      }
-      else {
-        localStorage.setItem('teamLoggedIn', 'true');
-        // Nếu đăng nhập thành công, chuyển hướng đến trang team
+      } else {
         navigate('/team');
       }
     } catch (err) {
@@ -38,18 +38,18 @@ function Login() {
       <form onSubmit={handleSubmit}>
         <FormControl mb="4">
           <FormLabel>Username</FormLabel>
-          <Input 
-            type="text" 
-            value={username} 
-            onChange={e => setUsername(e.target.value)} 
+          <Input
+            type="text"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
             placeholder="Enter your username" />
         </FormControl>
         <FormControl mb="4">
           <FormLabel>Password</FormLabel>
-          <Input 
-            type="password" 
-            value={password} 
-            onChange={e => setPassword(e.target.value)} 
+          <Input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
             placeholder="Enter your password" />
         </FormControl>
         {error && (
@@ -58,7 +58,7 @@ function Login() {
             {error}
           </Alert>
         )}
-        <Button type="submit" colorScheme="blue" width="full">
+        <Button type="submit" colorScheme="blue" width="full" isDisabled={!username || !password}>
           Login
         </Button>
       </form>

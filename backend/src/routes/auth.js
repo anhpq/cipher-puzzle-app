@@ -61,13 +61,12 @@ router.post('/logout', (req, res) => {
 });
 
 router.get('/verify', (req, res) => {
-  if (req.session.admin) {
+  if (req.session && req.session.admin) {
     return res.json({ isAuthenticated: true, role: 'admin' });
-  } else if (req.session.team) {
+  } else if (req.session && req.session.team) {
     return res.json({ isAuthenticated: true, role: 'team' });
-  } else {
-    return res.json({ isAuthenticated: false });
   }
+  return res.json({ isAuthenticated: false });
 });
 
 module.exports = router;
