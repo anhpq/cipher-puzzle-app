@@ -27,8 +27,18 @@ app.use('/api', authRoutes);
 const adminRoutes = require('./routes/admin');
 app.use('/api/admin', adminRoutes);
 
+const supportRouter = require('./routes/support');
+app.use('/api/admin/support', supportRouter);
+
+
+const reportsRouter = require('./routes/reports');
+app.use('/api/admin/reports', reportsRouter);
+
 const stagesRoutes = require('./routes/stages');
 app.use('/api/admin/stages', stagesRoutes);
+
+const teamsRoutes = require('./routes/teams');
+app.use('/api/admin/teams', teamsRoutes);
 
 const questionsRoutes = require('./routes/questions');
 app.use('/api/admin/questions', questionsRoutes);

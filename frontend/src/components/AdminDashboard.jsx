@@ -4,11 +4,13 @@ import { Box, Heading, Button, Tabs, TabList, TabPanels, Tab, TabPanel } from '@
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-// Import theo các file đã tạo
+// Import các component khác
 import StagesTab from './admin/StagesTab';
 import QuestionsTab from './admin/QuestionsTab';
 import TeamRoutesTab from './admin/TeamRoutesTab';
 import AssignmentsTab from './admin/AssignmentsTab';
+import TeamStatusSupportTab from './admin/TeamStatusSupportTab';
+import TeamTimeReportTab from './admin/TeamTimeReportTab';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -29,14 +31,23 @@ const AdminDashboard = () => {
       <Button colorScheme="red" mb={4} onClick={handleLogout}>
         Logout
       </Button>
-      <Tabs variant="enclosed" isFitted>
+      <Tabs variant="enclosed" isFitted isLazy>
         <TabList mb="1em">
+          <Tab>Team Status & Support</Tab>
+          <Tab>Report</Tab>
           <Tab>Stages</Tab>
           <Tab>Questions</Tab>
           <Tab>Team Routes</Tab>
           <Tab>Assignments</Tab>
         </TabList>
-        <TabPanels>
+        {/* unmountOnExit đảm bảo rằng mỗi tab khi không hiển thị sẽ bị unmount */}
+        <TabPanels unmountOnExit>
+          <TabPanel>
+            <TeamStatusSupportTab config={config} />
+          </TabPanel>
+          <TabPanel>
+            <TeamTimeReportTab config={config} />
+          </TabPanel>
           <TabPanel>
             <StagesTab config={config} />
           </TabPanel>

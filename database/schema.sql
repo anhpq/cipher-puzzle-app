@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS teams (
     team_id SERIAL PRIMARY KEY,
     team_name VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    current_stage_id INTEGER DEFAULT 1,
+    start_time TIMESTAMP DEFAULT NOW(),
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -40,6 +42,8 @@ CREATE TABLE IF NOT EXISTS team_routes (
     team_id INTEGER NOT NULL,
     stage_id INTEGER NOT NULL,
     route_order INTEGER NOT NULL,
+    completed BOOLEAN DEFAULT false,
+    completed_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT unique_team_route UNIQUE (team_id, route_order),
     CONSTRAINT fk_team
@@ -74,3 +78,14 @@ CREATE TABLE IF NOT EXISTS team_question_assignments (
       REFERENCES questions(question_id)
       ON DELETE CASCADE
 );
+
+CREATE VIEW team_current_stage AS
+SELECT t.team_id,
+       (
+         SELECT tr.stage_id
+         FROM team_routes tr
+         WHERE tr.team_id = t.team_id AND tr.completed = FALSE
+         ORDER BY tr.route_order
+         LIMIT 1
+       ) AS current_stage_id
+FROM teams t;
