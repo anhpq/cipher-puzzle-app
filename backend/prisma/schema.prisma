@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -12,4 +6,70 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model questions {
+  question_id               Int                         @id @default(autoincrement())
+  stage_id                  Int
+  question_text             String
+  answer                    String                      @db.VarChar(255)
+  hint1                     Bytes?
+  hint2                     Bytes?
+  created_at                DateTime?                   @default(now()) @db.Timestamp(6)
+  stages                    stages                      @relation(fields: [stage_id], references: [stage_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_stage")
+  team_question_assignments team_question_assignments[]
+}
+
+model stages {
+  stage_id                  Int                         @id @default(autoincrement())
+  stage_number              Int
+  stage_name                String                      @db.VarChar(255)
+  description               String?
+  open_code                 String?                     @db.VarChar(255)
+  location_image            Bytes?
+  created_at                DateTime?                   @default(now()) @db.Timestamp(6)
+  questions                 questions[]
+  team_question_assignments team_question_assignments[]
+  team_routes               team_routes[]
+}
+
+model team_question_assignments {
+  assignment_id   Int       @id @default(autoincrement())
+  team_id         Int
+  stage_id        Int
+  question_id     Int
+  assigned_at     DateTime? @default(now()) @db.Timestamp(6)
+  completed_at    DateTime? @db.Timestamp(6)
+  attempts        Int?      @default(0)
+  last_attempt_at DateTime? @db.Timestamp(6)
+  questions       questions @relation(fields: [question_id], references: [question_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_question_assignment")
+  stages          stages    @relation(fields: [stage_id], references: [stage_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_stage_assignment")
+  teams           teams     @relation(fields: [team_id], references: [team_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_team_assignment")
+}
+
+model team_routes {
+  team_route_id      Int       @id @default(autoincrement())
+  team_id            Int
+  stage_id           Int
+  route_order        Int
+  completed          Boolean?  @default(false)
+  start_at           DateTime? @db.Timestamp(6)
+  completed_at       DateTime? @db.Timestamp(6)
+  open_code_verified Boolean?  @default(false)
+  created_at         DateTime? @default(now()) @db.Timestamp(6)
+  stages             stages    @relation(fields: [stage_id], references: [stage_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_route_stage")
+  teams              teams     @relation(fields: [team_id], references: [team_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_team")
+
+  @@unique([team_id, route_order], map: "unique_team_route")
+}
+
+model teams {
+  team_id                   Int                         @id @default(autoincrement())
+  team_name                 String                      @unique @db.VarChar(255)
+  password                  String                      @db.VarChar(255)
+  current_stage_id          Int?                        @default(1)
+  start_time                DateTime?                   @default(now()) @db.Timestamp(6)
+  created_at                DateTime?                   @default(now()) @db.Timestamp(6)
+  team_question_assignments team_question_assignments[]
+  team_routes               team_routes[]
 }

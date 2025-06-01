@@ -7,3 +7,6 @@ dropdb -U $dbUser $dbName
 createdb -U $dbUser $dbName
 psql -U $dbUser -d $dbName -f ./database/schema.sql
 psql -U $dbUser -d $dbName -f ./database/seed.sql
+
+npx prisma db pull         # Lấy schema từ DB (nếu bạn có sẵn DB)
+npx prisma generate
