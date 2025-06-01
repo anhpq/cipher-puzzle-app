@@ -7,6 +7,7 @@ const pool = require("../db"); // Kết nối đến PostgreSQL
 
 // POST /api/login
 router.post("/login", async (req, res) => {
+  console.log("Received login request:", req.body);
   const { username, password } = req.body;
   console.log("Login attempt:", { username, password });
 
@@ -69,6 +70,7 @@ router.post("/logout", (req, res) => {
 });
 
 router.get("/verify", (req, res) => {
+  console.log("Session data:", req.session);
   console.log("Verifying authentication:", req.session.admin, req.session.team);
   if (req.session && req.session.admin) {
     return res.json({ isAuthenticated: true, role: "admin" });
