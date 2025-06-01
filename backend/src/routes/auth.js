@@ -20,8 +20,8 @@ router.post("/login", async (req, res) => {
   // Nếu đăng nhập của admin
   if (username.toLowerCase() === "admin") {
     if (password === process.env.ADMIN_PASSWORD) {
-      console.log("Admin login successful", req.session.admin);
       req.session.admin = true;
+      console.log("Admin login successful", req.session.admin);
       return res.json({ message: "Admin login successful.", role: "admin" });
     } else {
       return res.status(401).json({ error: "Invalid admin credentials." });
