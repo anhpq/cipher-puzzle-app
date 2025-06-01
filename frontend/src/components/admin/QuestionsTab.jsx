@@ -30,6 +30,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import API from '../../api';
 
 const QuestionsTab = ({ config }) => {
   const [questions, setQuestions] = useState([]);
@@ -62,7 +63,7 @@ const QuestionsTab = ({ config }) => {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/admin/questions', config);
+      const response = await axios.get(`${API}/api/admin/questions`, config);
       setQuestions(response.data);
     } catch (err) {
       setError(err.response?.data?.error || "Error fetching questions");
@@ -97,7 +98,7 @@ const QuestionsTab = ({ config }) => {
       if(newHint1) formData.append("hint1", newHint1);
       if(newHint2) formData.append("hint2", newHint2);
       
-      const response = await axios.post('http://localhost:5000/api/admin/questions', formData, {
+      const response = await axios.post(`${API}/api/admin/questions`, formData, {
         ...config,
         headers: { 'Content-Type': 'multipart/form-data' }
       });
@@ -161,7 +162,7 @@ const QuestionsTab = ({ config }) => {
       if(editHint2) formData.append("hint2", editHint2);
       
       const response = await axios.put(
-        `http://localhost:5000/api/admin/questions/${editingQuestion.question_id}`,
+        `${API}/api/admin/questions/${editingQuestion.question_id}`,
         formData,
         { ...config, headers: { 'Content-Type': 'multipart/form-data' } }
       );
@@ -191,7 +192,7 @@ const QuestionsTab = ({ config }) => {
   // Xoá câu hỏi
   const handleDeleteQuestion = async (questionId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/admin/questions/${questionId}`, config);
+      await axios.delete(`${API}/api/admin/questions/${questionId}`, config);
       setQuestions(questions.filter(q => q.question_id !== questionId));
       toast({
         title: "Question deleted.",

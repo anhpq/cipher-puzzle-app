@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import API from '../api';
 
 const AuthContext = createContext();
 
@@ -8,7 +9,7 @@ export const AuthProvider = ({ children }) => {
 
   const verifyAuth = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/verify', { withCredentials: true });
+      const response = await axios.get(`${API}/api/verify`, { withCredentials: true });
       setAuth({
         isAuthenticated: response.data.isAuthenticated,
         role: response.data.role,

@@ -28,6 +28,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import API from '../../api';
 
 const AssignmentsTab = ({ config }) => {
   const [assignments, setAssignments] = useState([]);
@@ -48,7 +49,7 @@ const AssignmentsTab = ({ config }) => {
   const fetchAssignments = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/admin/assignments', config);
+      const response = await axios.get(`${API}/api/admin/assignments`, config);
       setAssignments(response.data);
     } catch (err) {
       setError(err.response?.data?.error || "Error fetching assignments");
@@ -79,7 +80,7 @@ const AssignmentsTab = ({ config }) => {
   const handleUpdateAssignment = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/admin/assignments/${editingAssignment.assignment_id}`,
+        `${API}/api/admin/assignments/${editingAssignment.assignment_id}`,
         editAssignmentData,
         config
       );
@@ -108,7 +109,7 @@ const AssignmentsTab = ({ config }) => {
 
   const handleDeleteAssignment = async (assignmentId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/admin/assignments/${assignmentId}`, config);
+      await axios.delete(`${API}/api/admin/assignments/${assignmentId}`, config);
       setAssignments(assignments.filter(a => a.assignment_id !== assignmentId));
       toast({
         title: "Assignment deleted.",

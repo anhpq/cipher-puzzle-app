@@ -12,6 +12,7 @@ import AssignmentsTab from './admin/AssignmentsTab';
 import TeamStatusSupportTab from './admin/TeamStatusSupportTab';
 import TeamTimeReportTab from './admin/TeamTimeReportTab';
 import AuthContext from '../context/AuthContext';
+import API from '../api';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const AdminDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5000/api/logout', {}, config);
+      await axios.post(`${API}/api/logout`, {}, config);
       navigate('/');
     } catch (error) {
       console.error('Logout failed', error);

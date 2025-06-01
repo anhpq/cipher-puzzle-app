@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Heading, Text, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
 import axios from 'axios';
 import TeamDashboardWizard from './team/TeamDashboardWizard';
+import API from '../api';
 
 const TeamDashboard = () => {
   const [teamInfo, setTeamInfo] = useState(null);
@@ -13,7 +14,7 @@ const TeamDashboard = () => {
 
   const fetchTeamInfo = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/team-info/info', config);
+      const response = await axios.get(`${API}/api/team-info/info`, config);
       setTeamInfo(response.data);
       setLoading(false);
     } catch (err) {

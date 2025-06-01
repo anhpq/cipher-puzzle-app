@@ -16,6 +16,7 @@ import {
   Text
 } from '@chakra-ui/react';
 import axios from 'axios';
+import API from '../../api';
 
 const TeamStatusSupportTab = ({ config }) => {
   const [teams, setTeams] = useState([]);
@@ -27,7 +28,7 @@ const TeamStatusSupportTab = ({ config }) => {
     setLoading(true);
     try {
       // Giả sử endpoint trả về mảng đối tượng gồm: team_id, team_name, current_stage_id, stage_name
-      const response = await axios.get('http://localhost:5000/api/admin/teams/status', config);
+      const response = await axios.get(`${API}/api/admin/teams/status`, config);
       setTeams(response.data);
     } catch (err) {
       setError(err.response?.data?.error || "Lỗi khi tải dữ liệu trạng thái team");
@@ -44,7 +45,7 @@ const TeamStatusSupportTab = ({ config }) => {
   const handleRefresh = async (team_id, current_stage_id) => {
     try {
       await axios.put(
-        'http://localhost:5000/api/admin/support/refresh',
+        `${API}/api/admin/support/refresh`,
         { team_id, stage_id: current_stage_id },
         config
       );
@@ -60,7 +61,7 @@ const TeamStatusSupportTab = ({ config }) => {
   const handleAdvance = async (team_id, current_stage_id) => {
     try {
       await axios.put(
-        'http://localhost:5000/api/admin/support/advance',
+        `${API}/api/admin/support/advance`,
         { team_id, stage_id: current_stage_id },
         config
       );
