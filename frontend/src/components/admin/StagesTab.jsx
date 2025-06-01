@@ -29,6 +29,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import API from '../../api';
 
 const StagesTab = ({ config }) => {
   const [stages, setStages] = useState([]);
@@ -62,7 +63,7 @@ const StagesTab = ({ config }) => {
   const fetchStages = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/admin/stages', config);
+      const response = await axios.get(`${API}/api/admin/stages`, config);
       setStages(response.data);
       console.log("Fetched stages:", response.data);
     } catch (err) {
@@ -94,7 +95,7 @@ const StagesTab = ({ config }) => {
       if (newLocationImage) {
         formData.append("location_image", newLocationImage);
       }
-      const response = await axios.post('http://localhost:5000/api/admin/stages', formData, {
+      const response = await axios.post(`${API}/api/admin/stages`, formData, {
         ...config,
         headers: { 'Content-Type': 'multipart/form-data' },
       });
@@ -154,7 +155,7 @@ const StagesTab = ({ config }) => {
         formData.append("location_image", editingLocationImage);
       }
       const response = await axios.put(
-        `http://localhost:5000/api/admin/stages/${editingStage.stage_id}`,
+        `${API}/api/admin/stages/${editingStage.stage_id}`,
         formData,
         {
           ...config,
@@ -193,7 +194,7 @@ const StagesTab = ({ config }) => {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/admin/stages/${stageToDelete.stage_id}`, config);
+      await axios.delete(`${API}/api/admin/stages/${stageToDelete.stage_id}`, config);
       setStages(stages.filter((s) => s.stage_id !== stageToDelete.stage_id));
       toast({
         title: "Stage deleted.",

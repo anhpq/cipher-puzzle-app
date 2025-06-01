@@ -15,6 +15,7 @@ import {
   HStack
 } from '@chakra-ui/react';
 import axios from 'axios';
+import API from '../../api';
 
 const StageStep = ({
   stage,
@@ -62,7 +63,7 @@ const StageStep = ({
 
   const fetchHintTimers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/team-progress/get-hint', {
+      const response = await axios.get(`${API}/api/team-progress/get-hint`, {
         ...config,
         params: {
           stage_id: stage.stageId,
@@ -88,7 +89,7 @@ const StageStep = ({
   const handleVerifyOpenCode = async () => {
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/team-progress/verify-open-code',
+        `${API}/api/team-progress/verify-open-code`,
         {
           stage_id: stage.stageId,
           open_code: openCodeInput,
@@ -99,7 +100,7 @@ const StageStep = ({
         setVerified(true);
         setSubmitMessage("Valid open code! Please enter your answer.");
         if (isStageOne && typeof onAdvance === "function") {
-          await axios.put('http://localhost:5000/api/team-progress/start-time', {}, config);
+          await axios.put(`${API}/api/team-progress/start-time`, {}, config);
           if (typeof onAdvance === "function") onAdvance();
         }
       }
@@ -111,7 +112,7 @@ const StageStep = ({
   const handleSubmitAnswer = async () => {
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/team-progress/submit-answer',
+        `${API}/api/team-progress/submit-answer`,
         {
           stage_id: stage.stageId,
           question_id: stage.questionId,
@@ -120,7 +121,7 @@ const StageStep = ({
         config
       );
       if (response.data.success) {
-        await axios.put('http://localhost:5000/api/team-progress/advance-stage', { stage_id: stage.stageId }, config);
+        await axios.put(`${API}/api/team-progress/advance-stage`, { stage_id: stage.stageId }, config);
         setSubmitMessage("Correct answer! Stage completed.");
         if (typeof onAdvance === "function") onAdvance();
       }
@@ -131,7 +132,7 @@ const StageStep = ({
 
   const fetchHint = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/team-progress/get-hint', {
+      const response = await axios.get(`${API}/api/team-progress/get-hint`, {
         ...config,
         params: {
           stage_id: stage.stageId,
@@ -156,7 +157,7 @@ const StageStep = ({
 
   useEffect(() => {
     if (isFinalStage && verified) {
-      axios.get('http://localhost:5000/api/team-progress/total-time', config)
+      axios.get(`${API}/api/team-progress/total-time`, config)
         .then(res => {
           if (res.data && res.data.total_seconds != null) {
             const minutes = Math.floor(res.data.total_seconds / 60);

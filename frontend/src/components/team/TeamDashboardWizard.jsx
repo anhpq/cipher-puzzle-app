@@ -19,6 +19,7 @@ import { CheckIcon, TimeIcon } from '@chakra-ui/icons';
 import { FaLocationDot } from "react-icons/fa6";
 import StageStep from './StageStep';
 import axios from 'axios';
+import API from '../../api';
 
 const TeamDashboardWizard = ({ config, teamId, onAdvance }) => {
   const [stages, setStages] = useState([]);
@@ -28,7 +29,7 @@ const TeamDashboardWizard = ({ config, teamId, onAdvance }) => {
 
   const fetchStages = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/team-progress/current-stages', config);
+      const response = await axios.get(`${API}/api/team-progress/current-stages`, config);
       setStages(response.data);
       const index = response.data.findIndex(s => s.open_code_verified === true);
       setActiveStep(index === -1 ? 0 : index);

@@ -27,6 +27,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import API from '../../api';
 
 const TeamRoutesTab = ({ config }) => {
   // State lưu trữ dữ liệu aggregated trả về từ endpoint GET /aggregate
@@ -43,7 +44,7 @@ const TeamRoutesTab = ({ config }) => {
   const fetchAggregatedRoutes = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/admin/team-routes/aggregate', config);
+      const response = await axios.get(`${API}/api/admin/team-routes/aggregate`, config);
       // Endpoint trả về dữ liệu dạng:
       // [
       //   { team_id: "1", routes: [ { team_route_id, team_id, stage_id, route_order, stage_name }, ... ] },
@@ -84,7 +85,7 @@ const TeamRoutesTab = ({ config }) => {
     try {
       // PUT /api/admin/team-routes/aggregate/:team_id với body { routes: routeArray }
       await axios.put(
-        `http://localhost:5000/api/admin/team-routes/aggregate/${editingTeamRoute.team_id}`,
+        `${API}/api/admin/team-routes/aggregate/${editingTeamRoute.team_id}`,
         { routes: routeArray },
         config
       );
@@ -98,7 +99,7 @@ const TeamRoutesTab = ({ config }) => {
   const handleDeleteTeamRoute = async (team_id) => {
     try {
       // DELETE /api/admin/team-routes/aggregate/:team_id
-      await axios.delete(`http://localhost:5000/api/admin/team-routes/aggregate/${team_id}`, config);
+      await axios.delete(`${API}/api/admin/team-routes/aggregate/${team_id}`, config);
       fetchAggregatedRoutes();
     } catch (err) {
       console.error("Error deleting aggregated team route:", err);

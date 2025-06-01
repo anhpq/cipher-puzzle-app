@@ -15,6 +15,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import API from '../../api';
 
 // Hàm chuyển đổi số giây sang chuỗi HH:MM:SS
 const formatSeconds = (seconds) => {
@@ -34,7 +35,7 @@ const TeamTimeReportTab = ({ config }) => {
   const fetchReport = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/admin/reports/team-time', config);
+      const response = await axios.get(`${API}/api/admin/reports/team-time`, config);
       setReports(response.data);
     } catch (err) {
       setError(err.response?.data?.error || "Error fetching report data");

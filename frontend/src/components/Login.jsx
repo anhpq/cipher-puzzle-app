@@ -3,6 +3,7 @@ import { Box, Button, Input, FormControl, FormLabel, Alert, AlertIcon, Heading }
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import API from '../api';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -15,7 +16,7 @@ function Login() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/login',
+        `${API}/api/login`,
         { username, password },
         { withCredentials: true }
       );
