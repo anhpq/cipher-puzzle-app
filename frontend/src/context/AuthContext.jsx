@@ -10,12 +10,14 @@ export const AuthProvider = ({ children }) => {
   const verifyAuth = async () => {
     try {
       const response = await axios.get(`${API}/api/verify`, { withCredentials: true });
+      console.log('Authentication verification response:', response.data);
       setAuth({
         isAuthenticated: response.data.isAuthenticated,
         role: response.data.role,
         loading: false
       });
     } catch (error) {
+      console.log('Error verifying authentication:', error);
       setAuth({ isAuthenticated: false, role: null, loading: false });
     }
   };
