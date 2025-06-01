@@ -2,7 +2,8 @@
 
 const express = require('express');
 const router = express.Router();
-const db = require('../db');  // Đảm bảo module db đã được cấu hình kết nối PostgreSQL
+const db = require('../../db');  // Đảm bảo module db đã được cấu hình kết nối PostgreSQL
+const adminAuth = require('../../middlewares/adminAuth');
 
 /**
  * GET /api/admin/teams/status
@@ -73,7 +74,7 @@ router.post('/', async (req, res) => {
  * Cập nhật thông tin của một team.
  * Expected body: { team_name, password, current_stage_id }
  */
-router.put('/:team_id', async (req, res) => {
+router.put('/:team_id', adminAuth, async (req, res) => {
     const { team_id } = req.params;
     const { team_name, password, current_stage_id } = req.body;
     try {
@@ -97,7 +98,7 @@ router.put('/:team_id', async (req, res) => {
  * DELETE /api/admin/teams/:team_id
  * Xoá một team theo team_id.
  */
-router.delete('/:team_id', async (req, res) => {
+router.delete('/:team_id', adminAuth, async (req, res) => {
     const { team_id } = req.params;
     try {
         await db.query(`DELETE FROM teams WHERE team_id = $1`, [team_id]);

@@ -3,7 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
-import TeamPage from './components/TeamPage';
+import TeamDashboard from './components/TeamDashboard';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 
@@ -25,7 +25,7 @@ function App() {
             path="/team"
             element={
               <PrivateRoute>
-                <TeamPage />
+                <TeamDashboard />
               </PrivateRoute>
             }
           />
