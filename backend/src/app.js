@@ -24,27 +24,38 @@ app.use(
 const authRoutes = require('./routes/auth');
 app.use('/api', authRoutes);
 
-const adminRoutes = require('./routes/admin');
-app.use('/api/admin', adminRoutes);
+const assignmentRoutes = require('./routes/admin/assignments');
+app.use('/api/admin/assignments', assignmentRoutes);
 
-const supportRouter = require('./routes/support');
+const supportRouter = require('./routes/admin/support');
 app.use('/api/admin/support', supportRouter);
 
-
-const reportsRouter = require('./routes/reports');
+const reportsRouter = require('./routes/admin/reports');
 app.use('/api/admin/reports', reportsRouter);
 
-const stagesRoutes = require('./routes/stages');
+const stagesRoutes = require('./routes/admin/stages');
 app.use('/api/admin/stages', stagesRoutes);
 
-const teamsRoutes = require('./routes/teams');
+const teamsRoutes = require('./routes/admin/teams');
 app.use('/api/admin/teams', teamsRoutes);
 
-const questionsRoutes = require('./routes/questions');
+const questionsRoutes = require('./routes/admin/questions');
 app.use('/api/admin/questions', questionsRoutes);
 
-const teamRoutesRouter = require('./routes/teamRoutes');
+const teamRoutesRouter = require('./routes/admin/teamRoutes');
 app.use('/api/admin/team-routes', teamRoutesRouter);
+
+
+
+
+const teamProgressRouter = require('./routes/team/teamProgress');
+app.use('/api/team-progress', teamProgressRouter);
+
+const teamInfoRouter = require('./routes/team/teamInfo');
+app.use('/api/team-info', teamInfoRouter);
+
+
+
 
 app.get('/', (req, res) => {
   res.send('Cipher Puzzle Game API is running!');

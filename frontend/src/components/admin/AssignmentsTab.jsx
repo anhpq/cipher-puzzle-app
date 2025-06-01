@@ -1,3 +1,4 @@
+// frontend/src/components/AssignmentsTab.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -24,6 +25,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -31,8 +33,7 @@ const AssignmentsTab = ({ config }) => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  // Modal cho chỉnh sửa assignment
+  
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [editingAssignment, setEditingAssignment] = useState(null);
   const [editAssignmentData, setEditAssignmentData] = useState({
@@ -41,6 +42,8 @@ const AssignmentsTab = ({ config }) => {
     question_id: "",
     attempts: ""
   });
+  
+  const toast = useToast();
 
   const fetchAssignments = async () => {
     setLoading(true);
@@ -60,7 +63,12 @@ const AssignmentsTab = ({ config }) => {
 
   const handleEditClick = (assignment) => {
     setEditingAssignment(assignment);
-    setEditAssignmentData(assignment);
+    setEditAssignmentData({
+      team_id: assignment.team_id,
+      stage_id: assignment.stage_id,
+      question_id: assignment.question_id,
+      attempts: assignment.attempts
+    });
     onOpen();
   };
 
@@ -79,9 +87,22 @@ const AssignmentsTab = ({ config }) => {
         a.assignment_id === editingAssignment.assignment_id ? response.data : a
       );
       setAssignments(updatedAssignments);
+      toast({
+        title: "Assignment updated.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
       onClose();
     } catch (err) {
       console.error("Error updating assignment:", err);
+      toast({
+        title: "Error updating assignment.",
+        description: err.response?.data?.error || err.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -89,8 +110,21 @@ const AssignmentsTab = ({ config }) => {
     try {
       await axios.delete(`http://localhost:5000/api/admin/assignments/${assignmentId}`, config);
       setAssignments(assignments.filter(a => a.assignment_id !== assignmentId));
+      toast({
+        title: "Assignment deleted.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     } catch (err) {
       console.error("Error deleting assignment:", err);
+      toast({
+        title: "Error deleting assignment.",
+        description: err.response?.data?.error || err.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -138,7 +172,7 @@ const AssignmentsTab = ({ config }) => {
         </Table>
       )}
 
-      {/* Modal chỉnh sửa Assignment */}
+      {/* Modal chỉnh sửa assignment */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>

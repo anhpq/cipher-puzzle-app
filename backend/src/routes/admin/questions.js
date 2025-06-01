@@ -1,11 +1,11 @@
 // backend/src/routes/questions.js
 const express = require('express');
 const router = express.Router();
-const db = require('../db'); // Giả sử db.query được cấu hình truy vấn PostgreSQL
+const db = require('../../db'); // Giả sử db.query được cấu hình truy vấn PostgreSQL
 const multer = require('multer');
 const storage = multer.memoryStorage(); // Lưu file vào bộ nhớ
 const upload = multer({ storage: storage });
-const adminAuth = require('../middlewares/adminAuth');
+const adminAuth = require('../../middlewares/adminAuth');
 
 // POST: Thêm mới câu hỏi với file upload cho hint1 và hint2
 router.post('/', adminAuth, upload.fields([{ name: 'hint1' }, { name: 'hint2' }]), async (req, res) => {

@@ -25,7 +25,9 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Image
+  Image,
+  Text,
+  useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -39,11 +41,11 @@ const QuestionsTab = ({ config }) => {
     answer: ""
   });
   
-  // State để lưu file cho hint1 và hint2
+  // State để lưu file cho hint1 và hint2 khi thêm mới
   const [newHint1, setNewHint1] = useState(null);
   const [newHint2, setNewHint2] = useState(null);
 
-  // Modal cho chỉnh sửa câu hỏi
+  // Modal chỉnh sửa câu hỏi
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [editQuestionData, setEditQuestionData] = useState({
@@ -54,6 +56,9 @@ const QuestionsTab = ({ config }) => {
   const [editHint1, setEditHint1] = useState(null);
   const [editHint2, setEditHint2] = useState(null);
 
+  const toast = useToast();
+
+  // Lấy danh sách câu hỏi từ backend
   const fetchQuestions = async () => {
     setLoading(true);
     try {
@@ -82,7 +87,7 @@ const QuestionsTab = ({ config }) => {
     setNewHint2(e.target.files[0]);
   };
 
-  // Thêm câu hỏi mới: Sử dụng FormData để gửi file upload
+  // Thêm câu hỏi mới: sử dụng FormData để gửi kèm file upload
   const handleAddQuestion = async () => {
     try {
       const formData = new FormData();
@@ -98,18 +103,35 @@ const QuestionsTab = ({ config }) => {
       });
       setQuestions([...questions, response.data]);
       // Reset form
-      setNewQuestion({ stage_id: "", question_text: "", answer: ""});
+      setNewQuestion({ stage_id: "", question_text: "", answer: "" });
       setNewHint1(null);
       setNewHint2(null);
+      toast({
+        title: "Question added.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     } catch (err) {
       console.error("Error adding question:", err);
+      toast({
+        title: "Error adding question.",
+        description: err.response?.data?.error || err.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
+  // Khi nhấn nút Edit, mở modal chỉnh sửa câu hỏi và set dữ liệu ban đầu
   const handleEditClick = (question) => {
     setEditingQuestion(question);
-    // Set dữ liệu ban đầu cho form chỉnh sửa; nếu muốn cho phép upload lại file, bạn có thể để trống
-    setEditQuestionData(question);
+    setEditQuestionData({
+      stage_id: question.stage_id,
+      question_text: question.question_text,
+      answer: question.answer,
+    });
     setEditHint1(null);
     setEditHint2(null);
     onOpen();
@@ -127,13 +149,14 @@ const QuestionsTab = ({ config }) => {
     setEditHint2(e.target.files[0]);
   };
 
+  // Cập nhật câu hỏi từ modal sử dụng FormData để có thể gửi kèm file mới
   const handleUpdateQuestion = async () => {
     try {
       const formData = new FormData();
       formData.append("stage_id", editQuestionData.stage_id);
       formData.append("question_text", editQuestionData.question_text);
       formData.append("answer", editQuestionData.answer);
-      // Chỉ append file nếu người dùng upload mới
+      // Nếu có file mới, append vào formData
       if(editHint1) formData.append("hint1", editHint1);
       if(editHint2) formData.append("hint2", editHint2);
       
@@ -146,18 +169,45 @@ const QuestionsTab = ({ config }) => {
         q.question_id === editingQuestion.question_id ? response.data : q
       );
       setQuestions(updatedQuestions);
+      toast({
+        title: "Question updated.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
       onClose();
     } catch (err) {
       console.error("Error updating question:", err);
+      toast({
+        title: "Error updating question.",
+        description: err.response?.data?.error || err.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
+  // Xoá câu hỏi
   const handleDeleteQuestion = async (questionId) => {
     try {
       await axios.delete(`http://localhost:5000/api/admin/questions/${questionId}`, config);
       setQuestions(questions.filter(q => q.question_id !== questionId));
+      toast({
+        title: "Question deleted.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     } catch (err) {
       console.error("Error deleting question:", err);
+      toast({
+        title: "Error deleting question.",
+        description: err.response?.data?.error || err.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -168,23 +218,46 @@ const QuestionsTab = ({ config }) => {
       <VStack spacing={3} mb={4}>
         <FormControl>
           <FormLabel>Stage ID</FormLabel>
-          <Input type="number" name="stage_id" value={newQuestion.stage_id} onChange={handleNewQuestionChange} />
+          <Input 
+            type="number" 
+            name="stage_id" 
+            value={newQuestion.stage_id} 
+            onChange={handleNewQuestionChange} 
+          />
         </FormControl>
         <FormControl>
           <FormLabel>Question Text</FormLabel>
-          <Input type="text" name="question_text" value={newQuestion.question_text} onChange={handleNewQuestionChange} />
+          <Input 
+            type="text" 
+            name="question_text" 
+            value={newQuestion.question_text} 
+            onChange={handleNewQuestionChange} 
+          />
         </FormControl>
         <FormControl>
           <FormLabel>Answer</FormLabel>
-          <Input type="text" name="answer" value={newQuestion.answer} onChange={handleNewQuestionChange} />
+          <Input 
+            type="text" 
+            name="answer" 
+            value={newQuestion.answer} 
+            onChange={handleNewQuestionChange} 
+          />
         </FormControl>
         <FormControl>
           <FormLabel>Hint 1 (Image)</FormLabel>
-          <Input type="file" accept="image/*" onChange={handleNewHint1Change} />
+          <Input 
+            type="file" 
+            accept="image/*" 
+            onChange={handleNewHint1Change} 
+          />
         </FormControl>
         <FormControl>
           <FormLabel>Hint 2 (Image)</FormLabel>
-          <Input type="file" accept="image/*" onChange={handleNewHint2Change} />
+          <Input 
+            type="file" 
+            accept="image/*" 
+            onChange={handleNewHint2Change} 
+          />
         </FormControl>
         <Button colorScheme="blue" onClick={handleAddQuestion}>
           Add Question
@@ -243,10 +316,19 @@ const QuestionsTab = ({ config }) => {
                   )}
                 </Td>
                 <Td>
-                  <Button size="sm" colorScheme="blue" mr={2} onClick={() => handleEditClick(q)}>
+                  <Button 
+                    size="sm" 
+                    colorScheme="blue" 
+                    mr={2} 
+                    onClick={() => handleEditClick(q)}
+                  >
                     Edit
                   </Button>
-                  <Button size="sm" colorScheme="red" onClick={() => handleDeleteQuestion(q.question_id)}>
+                  <Button 
+                    size="sm" 
+                    colorScheme="red" 
+                    onClick={() => handleDeleteQuestion(q.question_id)}
+                  >
                     Delete
                   </Button>
                 </Td>
@@ -266,8 +348,8 @@ const QuestionsTab = ({ config }) => {
             <VStack spacing={3}>
               <FormControl>
                 <FormLabel>Stage ID</FormLabel>
-                <Input
-                  type="number"
+                <Input 
+                  type="number" 
                   name="stage_id"
                   value={editQuestionData.stage_id}
                   onChange={handleEditChange}
@@ -275,8 +357,8 @@ const QuestionsTab = ({ config }) => {
               </FormControl>
               <FormControl>
                 <FormLabel>Question Text</FormLabel>
-                <Input
-                  type="text"
+                <Input 
+                  type="text" 
                   name="question_text"
                   value={editQuestionData.question_text}
                   onChange={handleEditChange}
@@ -284,8 +366,8 @@ const QuestionsTab = ({ config }) => {
               </FormControl>
               <FormControl>
                 <FormLabel>Answer</FormLabel>
-                <Input
-                  type="text"
+                <Input 
+                  type="text" 
                   name="answer"
                   value={editQuestionData.answer}
                   onChange={handleEditChange}
@@ -293,7 +375,11 @@ const QuestionsTab = ({ config }) => {
               </FormControl>
               <FormControl>
                 <FormLabel>Hint 1 (Image)</FormLabel>
-                <Input type="file" accept="image/*" onChange={handleEditHint1Change} />
+                <Input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleEditHint1Change} 
+                />
                 {editingQuestion && editingQuestion.hint1 && !editHint1 && (
                   <Box mt={2}>
                     <Text fontSize="sm" color="gray.500">Current Hint 1:</Text>
@@ -308,7 +394,11 @@ const QuestionsTab = ({ config }) => {
               </FormControl>
               <FormControl>
                 <FormLabel>Hint 2 (Image)</FormLabel>
-                <Input type="file" accept="image/*" onChange={handleEditHint2Change} />
+                <Input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleEditHint2Change} 
+                />
                 {editingQuestion && editingQuestion.hint2 && !editHint2 && (
                   <Box mt={2}>
                     <Text fontSize="sm" color="gray.500">Current Hint 2:</Text>

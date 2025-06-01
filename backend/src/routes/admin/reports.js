@@ -1,7 +1,8 @@
 // backend/src/routes/reports.js
 const express = require('express');
 const router = express.Router();
-const db = require('../db'); // Đảm bảo db đã được cấu hình (ví dụ sử dụng pg Pool)
+const db = require('../../db'); // Đảm bảo db đã được cấu hình (ví dụ sử dụng pg Pool)
+const adminAuth = require('../../middlewares/adminAuth');
 
 //
 // GET /api/admin/reports/team-time
@@ -9,7 +10,7 @@ const db = require('../db'); // Đảm bảo db đã được cấu hình (ví d
 // Mỗi record có: team_id, team_name, mảng stages (gồm: stage_id, stage_number, stage_name, duration_sec)
 // và tổng thời gian hoàn thành (total_duration_sec)
 //
-router.get('/team-time', async (req, res) => {
+router.get('/team-time', adminAuth, async (req, res) => {
   try {
     const query = `
       SELECT

@@ -1,5 +1,5 @@
 // frontend/src/components/AdminDashboard.jsx
-import React from 'react';
+import React, { useContext } from 'react';
 import { Box, Heading, Button, Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -11,9 +11,16 @@ import TeamRoutesTab from './admin/TeamRoutesTab';
 import AssignmentsTab from './admin/AssignmentsTab';
 import TeamStatusSupportTab from './admin/TeamStatusSupportTab';
 import TeamTimeReportTab from './admin/TeamTimeReportTab';
+import AuthContext from '../context/AuthContext';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+
+  const { auth } = useContext(AuthContext);
+  if (auth.role !== 'admin') {
+    navigate('/team');
+  }
+
   const config = { withCredentials: true };
 
   const handleLogout = async () => {
