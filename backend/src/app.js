@@ -3,8 +3,12 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
+const pg = require("pg");
+const PgSession = require("connect-pg-simple")(session);
 
 const app = express();
+
+app.set("trust proxy", 1);
 
 // Middleware: enable CORS and JSON body parsing
 app.use(
@@ -18,9 +22,22 @@ app.use(
 );
 app.use(express.json());
 
+// Tạo pool kết nối Postgres
+const pgPool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL, // URL hoặc chuỗi kết nối DB của bạn
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false, // nếu dùng SSL trên prod
+});
+
 // Configure express-session with a maximum age of 2 days (in milliseconds)
 app.use(
   session({
+    store: new PgSession({
+      pool: pgPool, // Sử dụng pool Postgres
+      tableName: "session", // Tên bảng lưu session (mặc định là "session")
+    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
