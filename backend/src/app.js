@@ -11,10 +11,11 @@ const app = express();
 // Middleware: enable CORS and JSON body parsing
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? process.env.FE
-        : true,
+    origin: [
+      "http://localhost:5173",
+      "https://cipher-puzzle-frontend.up.railway.app",
+      "https://cipher-puzzle-app.vercel.app", // nếu vẫn deploy song song trên Vercel
+    ],
     credentials: true,
   })
 );
@@ -98,16 +99,14 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-
-
 // route test login dummy (login giả)
-app.post('/api/test-login', (req, res) => {
+app.post("/api/test-login", (req, res) => {
   req.session.admin = true; // hoặc req.session.user = 'admin'
-  res.json({ message: 'Logged in', sessionID: req.sessionID });
+  res.json({ message: "Logged in", sessionID: req.sessionID });
 });
 
 // route test verify session
-app.get('/api/test-verify', (req, res) => {
+app.get("/api/test-verify", (req, res) => {
   console.log("🔐 Session ID verify:", req.sessionID);
   console.log("🔐 Session content:", req.session);
   res.json({
