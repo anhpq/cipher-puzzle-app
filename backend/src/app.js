@@ -34,6 +34,7 @@ app.set("trust proxy", 1);
 
 console.log("Postgres pool created");
 // Configure express-session with a maximum age of 2 days (in milliseconds)
+console.log("app.use.session", app.use.session);
 app.use(
   session({
     store: new PgSession({
@@ -47,10 +48,12 @@ app.use(
       maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
       secure: process.env.NODE_ENV === "production", // Bắt buộc dùng HTTPS khi production
       httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Cho phép cross-origin cookie
+      sameSite: "none", // Cho phép cross-origin cookie
     },
   })
 );
+
+
 // Load routes
 const authRoutes = require("./routes/auth");
 app.use("/api", authRoutes);

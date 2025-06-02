@@ -7,9 +7,12 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({ isAuthenticated: false, role: null, loading: true });
 
+  const config = { withCredentials: true };
+
   const verifyAuth = async () => {
     try {
-      const response = await axios.get(`${API}/api/verify`, {}, { withCredentials: true });
+      console.log('Verifying authentication...', config);
+      const response = await axios.get(`${API}/api/verify`, config);
       console.log('Authentication verification response:', response.data);
       setAuth({
         isAuthenticated: response.data.isAuthenticated,
