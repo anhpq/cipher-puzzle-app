@@ -15,18 +15,17 @@ export const AuthProvider = ({ children }) => {
 
   const verifyAuth = async () => {
     console.log("🔍 verifyAuth called");
-    if (auth.isAuthenticated) return;
     try {
       console.log("Verifying authentication...", config);
       const response = await axios.get(`${API}/api/verify`, config);
-      console.log("Authentication verification response:", response.data);
+      console.log("✅ Authentication verification response:", response.data);
       setAuth({
         isAuthenticated: response.data.isAuthenticated,
         role: response.data.role,
         loading: false,
       });
     } catch (error) {
-      console.log("Error verifying authentication:", error);
+      console.log("❌ Error verifying authentication:", error);
       setAuth({ isAuthenticated: false, role: null, loading: false });
     }
   };
@@ -36,7 +35,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const refreshAuth = async () => {
-    await verifyAuth(); // đảm bảo gọi được await bên ngoài
+    await verifyAuth();
   };
 
   return (

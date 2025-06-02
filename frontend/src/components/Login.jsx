@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext } from 'react';
 import {
   Box,
   Button,
@@ -8,16 +8,16 @@ import {
   Alert,
   AlertIcon,
   Heading,
-} from "@chakra-ui/react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import AuthContext from "../context/AuthContext";
-import API from "../api";
+} from '@chakra-ui/react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import AuthContext from '../context/AuthContext';
+import API from '../api';
 
 function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   const { refreshAuth } = useContext(AuthContext);
 
@@ -30,33 +30,31 @@ function Login() {
         { withCredentials: true }
       );
 
-      // ⚠️ Tạm hoãn verifyAuth() để chờ trình duyệt lưu cookie
+      // ✅ Chờ trình duyệt lưu cookie rồi mới verify
       setTimeout(async () => {
         await refreshAuth();
 
-        if (response.data.role === "admin") {
-          navigate("/admin/dashboard");
+        if (response.data.role === 'admin') {
+          navigate('/admin/dashboard');
         } else {
-          navigate("/team");
+          navigate('/team');
         }
-      }, 100); // 100ms là đủ cho trình duyệt lưu cookie
+      }, 100);
     } catch (err) {
-      setError(err.response?.data?.error || "Login error.");
+      setError(err.response?.data?.error || 'Login error.');
     }
   };
 
   return (
     <Box maxW="md" mx="auto" mt="10">
-      <Heading mb="6" textAlign="center">
-        Welcome to the Game
-      </Heading>
+      <Heading mb="6" textAlign="center">Welcome to the Game</Heading>
       <form onSubmit={handleSubmit}>
         <FormControl mb="4">
           <FormLabel>Username</FormLabel>
           <Input
             type="text"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={e => setUsername(e.target.value)}
             placeholder="Enter your username"
           />
         </FormControl>
@@ -65,7 +63,7 @@ function Login() {
           <Input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             placeholder="Enter your password"
           />
         </FormControl>
