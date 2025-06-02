@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
 
   const verifyAuth = async () => {
     try {
-      const response = await axios.get(`${API}/api/verify`, { withCredentials: true });
+      const response = await axios.get(`${API}/api/verify`, {}, { withCredentials: true });
       console.log('Authentication verification response:', response.data);
       setAuth({
         isAuthenticated: response.data.isAuthenticated,

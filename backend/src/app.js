@@ -8,8 +8,6 @@ const PgSession = require("connect-pg-simple")(session);
 
 const app = express();
 
-app.set("trust proxy", 1);
-
 // Middleware: enable CORS and JSON body parsing
 app.use(
   cors({
@@ -30,6 +28,9 @@ const pgPool = new pg.Pool({
       ? { rejectUnauthorized: false }
       : false, // nếu dùng SSL trên prod
 });
+
+console.log("trust proxy");
+app.set("trust proxy", 1);
 
 console.log("Postgres pool created");
 // Configure express-session with a maximum age of 2 days (in milliseconds)
