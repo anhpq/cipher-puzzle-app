@@ -30,7 +30,7 @@ import {
 import axios from 'axios';
 import API from '../../api';
 
-const AssignmentsTab = ({ config }) => {
+const AssignmentsTab = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -49,7 +49,7 @@ const AssignmentsTab = ({ config }) => {
   const fetchAssignments = async () => {
     setLoading(true);
     try {
-      const response = await API.get(`/api/admin/assignments`, config);
+      const response = await API.get(`/api/admin/assignments`);
       setAssignments(response.data);
     } catch (err) {
       setError(err.response?.data?.error || "Error fetching assignments");
@@ -81,8 +81,7 @@ const AssignmentsTab = ({ config }) => {
     try {
       const response = await API.put(
         `/api/admin/assignments/${editingAssignment.assignment_id}`,
-        editAssignmentData,
-        config
+        editAssignmentData
       );
       const updatedAssignments = assignments.map(a =>
         a.assignment_id === editingAssignment.assignment_id ? response.data : a
@@ -109,7 +108,7 @@ const AssignmentsTab = ({ config }) => {
 
   const handleDeleteAssignment = async (assignmentId) => {
     try {
-      await API.delete(`/api/admin/assignments/${assignmentId}`, config);
+      await API.delete(`/api/admin/assignments/${assignmentId}`);
       setAssignments(assignments.filter(a => a.assignment_id !== assignmentId));
       toast({
         title: "Assignment deleted.",

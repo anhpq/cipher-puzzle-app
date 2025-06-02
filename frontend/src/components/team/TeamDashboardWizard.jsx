@@ -21,7 +21,7 @@ import StageStep from './StageStep';
 import axios from 'axios';
 import API from '../../api';
 
-const TeamDashboardWizard = ({ config, teamId, onAdvance }) => {
+const TeamDashboardWizard = ({ teamId, onAdvance }) => {
   const [stages, setStages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(0);
@@ -29,7 +29,7 @@ const TeamDashboardWizard = ({ config, teamId, onAdvance }) => {
 
   const fetchStages = async () => {
     try {
-      const response = await API.get(`/api/team-progress/current-stages`, config);
+      const response = await API.get(`/api/team-progress/current-stages`);
       setStages(response.data);
       const index = response.data.findIndex(s => s.open_code_verified === true);
       setActiveStep(index === -1 ? 0 : index);
@@ -58,7 +58,6 @@ const TeamDashboardWizard = ({ config, teamId, onAdvance }) => {
   }
 
   const currentStage = stages[activeStep];
-  console.log("Current Stage:", currentStage);
   const visibleStages = stages.filter((_, index) =>
     index === activeStep - 1 || index === activeStep || index === activeStep + 1
   );
@@ -96,7 +95,6 @@ const TeamDashboardWizard = ({ config, teamId, onAdvance }) => {
             teamId={teamId}
             isStageOne={currentStage.stageNumber === 1}
             onAdvance={handleAdvance}
-            config={config}
             initialVerified={currentStage.open_code_verified}
           />
         </Box>

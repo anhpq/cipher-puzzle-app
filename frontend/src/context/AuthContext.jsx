@@ -11,13 +11,9 @@ export const AuthProvider = ({ children }) => {
     loading: true,
   });
 
-  const config = { withCredentials: true };
-
   const verifyAuth = async () => {
-    console.log("🔍 verifyAuth called");
     try {
-      const response = await API.get(`/api/verify`, config);
-      console.log("✅ Authentication verification response:", response.data);
+      const response = await API.get(`/api/verify`);
       setAuth({
         isAuthenticated: response.data.isAuthenticated,
         role: response.data.role,
@@ -29,8 +25,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  useEffect(async () => {
-    await verifyAuth();
+  useEffect(() => {
+    const checkAuth = async () => {
+      await verifyAuth();
+    };
+    checkAuth();
   }, []);
 
   const refreshAuth = async () => {

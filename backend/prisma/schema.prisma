@@ -73,3 +73,10 @@ model teams {
   team_question_assignments team_question_assignments[]
   team_routes               team_routes[]
 }
+
+model session {
+  sid           String   @id
+  sess          Json
+  expire        DateTime @map("expire")
+  @@map("session") // tên bảng đúng với connect-pg-simple
+}

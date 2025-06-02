@@ -30,10 +30,8 @@ const pgPool = new pg.Pool({
       : false, // nếu dùng SSL trên prod
 });
 
-console.log("trust proxy");
 app.set("trust proxy", 1);
 
-console.log("Postgres pool created");
 // Configure express-session with a maximum age of 2 days (in milliseconds)
 app.use(
   session({
@@ -55,7 +53,6 @@ app.use(
 );
 
 app.use((req, res, next) => {
-  console.log("🧪 Incoming cookie:", req.headers.cookie);
   next();
 });
 
@@ -97,21 +94,4 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-});
-
-// route test login dummy (login giả)
-app.post("/api/test-login", (req, res) => {
-  req.session.admin = true; // hoặc req.session.user = 'admin'
-  res.json({ message: "Logged in", sessionID: req.sessionID });
-});
-
-// route test verify session
-app.get("/api/test-verify", (req, res) => {
-  console.log("🔐 Session ID verify:", req.sessionID);
-  console.log("🔐 Session content:", req.session);
-  res.json({
-    isAuthenticated: !!req.session.admin,
-    sessionID: req.sessionID,
-    session: req.session,
-  });
 });

@@ -27,7 +27,7 @@ const formatSeconds = (seconds) => {
   return `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
 };
 
-const TeamTimeReportTab = ({ config }) => {
+const TeamTimeReportTab = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -35,7 +35,7 @@ const TeamTimeReportTab = ({ config }) => {
   const fetchReport = async () => {
     setLoading(true);
     try {
-      const response = await API.get(`/api/admin/reports/team-time`, config);
+      const response = await API.get(`/api/admin/reports/team-time`);
       setReports(response.data);
     } catch (err) {
       setError(err.response?.data?.error || "Error fetching report data");

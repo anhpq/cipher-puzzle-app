@@ -1,20 +1,25 @@
 // frontend/src/components/TeamDashboard.jsx
-import React, { useState, useEffect } from 'react';
-import { Container, Heading, Text, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
-import axios from 'axios';
-import TeamDashboardWizard from './team/TeamDashboardWizard';
-import API from '../api';
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Heading,
+  Text,
+  Spinner,
+  Alert,
+  AlertIcon,
+} from "@chakra-ui/react";
+import axios from "axios";
+import TeamDashboardWizard from "./team/TeamDashboardWizard";
+import API from "../api";
 
 const TeamDashboard = () => {
   const [teamInfo, setTeamInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const config = { withCredentials: true };
-
   const fetchTeamInfo = async () => {
     try {
-      const response = await API.get(`/api/team-info/info`, config);
+      const response = await API.get(`/api/team-info/info`);
       setTeamInfo(response.data);
       setLoading(false);
     } catch (err) {
@@ -48,7 +53,10 @@ const TeamDashboard = () => {
               Game started at: {new Date(teamInfo.start_time).toLocaleString()}
             </Text>
           )}
-          <TeamDashboardWizard config={config} teamId={teamInfo.team_id} onAdvance={fetchTeamInfo} />
+          <TeamDashboardWizard
+            teamId={teamInfo.team_id}
+            onAdvance={fetchTeamInfo}
+          />
         </>
       )}
     </Container>

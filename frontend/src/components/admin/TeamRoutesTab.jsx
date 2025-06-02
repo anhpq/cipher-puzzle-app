@@ -1,5 +1,5 @@
 // frontend/src/components/TeamRoutesTab.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Heading,
@@ -25,11 +25,11 @@ import {
   ModalBody,
   ModalCloseButton,
   Text,
-} from '@chakra-ui/react';
-import axios from 'axios';
-import API from '../../api';
+} from "@chakra-ui/react";
+import axios from "axios";
+import API from "../../api";
 
-const TeamRoutesTab = ({ config }) => {
+const TeamRoutesTab = () => {
   // State lưu trữ dữ liệu aggregated trả về từ endpoint GET /aggregate
   const [groupedRoutes, setGroupedRoutes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,16 +44,19 @@ const TeamRoutesTab = ({ config }) => {
   const fetchAggregatedRoutes = async () => {
     setLoading(true);
     try {
-      const response = await API.get(`/api/admin/team-routes/aggregate`, config);
+      const response = await API.get(`/api/admin/team-routes/aggregate`);
       // Endpoint trả về dữ liệu dạng:
       // [
       //   { team_id: "1", routes: [ { team_route_id, team_id, stage_id, route_order, stage_name }, ... ] },
       //   { team_id: "2", routes: [ ... ] },
       //   ...
       // ]
+      console.log("Aggregated Routes Response:", response.data);
       setGroupedRoutes(response.data);
     } catch (err) {
-      setError(err.response?.data?.error || "Error fetching aggregated team routes");
+      setError(
+        err.response?.data?.error || "Error fetching aggregated team routes"
+      );
     } finally {
       setLoading(false);
     }
@@ -78,7 +81,7 @@ const TeamRoutesTab = ({ config }) => {
   // Khi cập nhật, chuyển chuỗi nhập vào thành mảng số sau đó gọi API PUT aggregate endpoint
   const handleUpdateTeamRoute = async () => {
     const routeArray = editRouteString
-      .split(',')
+      .split(",")
       .map((s) => s.trim())
       .filter((s) => s !== "")
       .map(Number);
@@ -86,8 +89,7 @@ const TeamRoutesTab = ({ config }) => {
       // PUT /api/admin/team-routes/aggregate/:team_id với body { routes: routeArray }
       await API.put(
         `/api/admin/team-routes/aggregate/${editingTeamRoute.team_id}`,
-        { routes: routeArray },
-        config
+        { routes: routeArray }
       );
       fetchAggregatedRoutes();
       onClose();
@@ -99,7 +101,7 @@ const TeamRoutesTab = ({ config }) => {
   const handleDeleteTeamRoute = async (team_id) => {
     try {
       // DELETE /api/admin/team-routes/aggregate/:team_id
-      await API.delete(`/api/admin/team-routes/aggregate/${team_id}`, config);
+      await API.delete(`/api/admin/team-routes/aggregate/${team_id}`);
       fetchAggregatedRoutes();
     } catch (err) {
       console.error("Error deleting aggregated team route:", err);
@@ -108,7 +110,9 @@ const TeamRoutesTab = ({ config }) => {
 
   return (
     <Box>
-      <Heading size="md" mb={2}>Team Routes Management (Aggregated)</Heading>
+      <Heading size="md" mb={2}>
+        Team Routes Management (Aggregated)
+      </Heading>
       {loading ? (
         <Spinner />
       ) : error ? (
@@ -120,7 +124,7 @@ const TeamRoutesTab = ({ config }) => {
         <Table variant="simple">
           <Thead>
             <Tr>
-              <Th>Team ID</Th>
+              <Th>Team</Th>
               <Th>Route</Th>
               <Th>Actions</Th>
             </Tr>
@@ -128,10 +132,15 @@ const TeamRoutesTab = ({ config }) => {
           <Tbody>
             {groupedRoutes.map((team) => (
               <Tr key={team.team_id}>
-                <Td>{team.team_id}</Td>
+                <Td>
+                  {team.team_id} - {team.routes[0].team_name}
+                </Td>
                 <Td>
                   {team.routes.map((r, index) => (
-                    <span key={index}>
+                    <span
+                      key={index}
+                      style={{ backgroundColor: r.completed ? "gray" : "" }}
+                    >
                       {r.stage_id} - ({r.stage_name})<br />
                     </span>
                   ))}
@@ -148,6 +157,7 @@ const TeamRoutesTab = ({ config }) => {
                   <Button
                     size="sm"
                     colorScheme="red"
+                    hidden={true}
                     onClick={() => handleDeleteTeamRoute(team.team_id)}
                   >
                     Delete
@@ -168,14 +178,23 @@ const TeamRoutesTab = ({ config }) => {
           <ModalBody>
             <FormControl>
               <FormLabel>Team ID</FormLabel>
-              <Input type="text" value={editingTeamRoute ? editingTeamRoute.team_id : ""} readOnly />
+              <Input
+                type="text"
+                value={editingTeamRoute ? editingTeamRoute.team_id : ""}
+                readOnly
+              />
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Route (Comma separated Stage IDs)</FormLabel>
-              <Input type="text" value={editRouteString} onChange={handleEditChange} />
+              <Input
+                type="text"
+                value={editRouteString}
+                onChange={handleEditChange}
+              />
             </FormControl>
             <Text mt={2} fontSize="sm" color="gray.500">
-              (The stage names will be updated automatically based on your configuration.)
+              (The stage names will be updated automatically based on your
+              configuration.)
             </Text>
           </ModalBody>
           <ModalFooter>

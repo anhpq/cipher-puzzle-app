@@ -65,9 +65,10 @@ router.get('/aggregate', adminAuth, async (req, res) => {
   try {
     // Truy vấn tất cả các bản ghi và join với stages để lấy stage_name
     const result = await db.query(
-      `SELECT tr.*, s.stage_name
+      `SELECT tr.*, s.stage_name, t.team_name
        FROM team_routes tr
        JOIN stages s ON tr.stage_id = s.stage_id
+       JOIN TEAMS T ON TR.TEAM_ID = T.TEAM_ID
        ORDER BY tr.team_id, tr.route_order`
     );
 

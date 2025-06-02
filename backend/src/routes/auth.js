@@ -7,9 +7,7 @@ const pool = require("../db"); // Kết nối đến PostgreSQL
 
 // POST /api/login
 router.post("/login", async (req, res) => {
-  console.log("Received login request:", req.body);
   const { username, password } = req.body;
-  console.log("Login attempt:", { username, password });
 
   // Kiểm tra dữ liệu đầu vào
   if (!username || !password) {
@@ -22,9 +20,6 @@ router.post("/login", async (req, res) => {
   if (username.toLowerCase() === "admin") {
     if (password === process.env.ADMIN_PASSWORD) {
       req.session.admin = true;
-      console.log("req.session.admin", req.session.admin);
-      console.log("Session after login:", req.session);
-      res.cookie("debug-cookie", "test", { httpOnly: false });
       return res.json({ message: "Admin login successful.", role: "admin" });
     } else {
       return res.status(401).json({ error: "Invalid admin credentials." });
@@ -47,10 +42,6 @@ router.post("/login", async (req, res) => {
     if (password === team.password) {
       req.session.team = true;
       req.session.teamId = team.team_id;
-      console.log("Session after login:", req.session);
-      console.log("req.session.team:", req.session.team);
-      console.log("req.session.teamId:", req.session.teamId);
-      res.cookie("debug-cookie", "test", { httpOnly: false });
       return res.json({ message: "Team login successful.", role: "team" });
     } else {
       return res.status(401).json({ error: "Invalid team credentials." });
@@ -75,9 +66,6 @@ router.post("/logout", (req, res) => {
 });
 
 router.get("/verify", (req, res) => {
-  console.log("🔐 Session ID:", req.sessionID);
-  console.log("🔐 req.session.admin:", req.session.admin);
-  console.log("🔐 Full session:", req.session);
   if (req.session && req.session.admin) {
     return res.json({ isAuthenticated: true, role: "admin" });
   } else if (req.session && req.session.team) {

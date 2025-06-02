@@ -31,7 +31,7 @@ import {
 import axios from 'axios';
 import API from '../../api';
 
-const StagesTab = ({ config }) => {
+const StagesTab = () => {
   const [stages, setStages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -63,9 +63,8 @@ const StagesTab = ({ config }) => {
   const fetchStages = async () => {
     setLoading(true);
     try {
-      const response = await API.get(`/api/admin/stages`, config);
+      const response = await API.get(`/api/admin/stages`);
       setStages(response.data);
-      console.log("Fetched stages:", response.data);
     } catch (err) {
       setError(err.response?.data?.error || "Error fetching stages");
     } finally {
@@ -96,7 +95,6 @@ const StagesTab = ({ config }) => {
         formData.append("location_image", newLocationImage);
       }
       const response = await API.post(`/api/admin/stages`, formData, {
-        ...config,
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setStages([...stages, response.data]);
@@ -158,7 +156,6 @@ const StagesTab = ({ config }) => {
         `/api/admin/stages/${editingStage.stage_id}`,
         formData,
         {
-          ...config,
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
@@ -194,7 +191,7 @@ const StagesTab = ({ config }) => {
 
   const handleConfirmDelete = async () => {
     try {
-      await API.delete(`/api/admin/stages/${stageToDelete.stage_id}`, config);
+      await API.delete(`/api/admin/stages/${stageToDelete.stage_id}`);
       setStages(stages.filter((s) => s.stage_id !== stageToDelete.stage_id));
       toast({
         title: "Stage deleted.",

@@ -32,7 +32,7 @@ import {
 import axios from 'axios';
 import API from '../../api';
 
-const QuestionsTab = ({ config }) => {
+const QuestionsTab = () => {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -63,7 +63,7 @@ const QuestionsTab = ({ config }) => {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const response = await API.get(`/api/admin/questions`, config);
+      const response = await API.get(`/api/admin/questions`);
       setQuestions(response.data);
     } catch (err) {
       setError(err.response?.data?.error || "Error fetching questions");
@@ -99,7 +99,6 @@ const QuestionsTab = ({ config }) => {
       if(newHint2) formData.append("hint2", newHint2);
       
       const response = await API.post(`/api/admin/questions`, formData, {
-        ...config,
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setQuestions([...questions, response.data]);
@@ -164,7 +163,7 @@ const QuestionsTab = ({ config }) => {
       const response = await API.put(
         `/api/admin/questions/${editingQuestion.question_id}`,
         formData,
-        { ...config, headers: { 'Content-Type': 'multipart/form-data' } }
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       const updatedQuestions = questions.map(q =>
         q.question_id === editingQuestion.question_id ? response.data : q
@@ -192,7 +191,7 @@ const QuestionsTab = ({ config }) => {
   // Xoá câu hỏi
   const handleDeleteQuestion = async (questionId) => {
     try {
-      await API.delete(`/api/admin/questions/${questionId}`, config);
+      await API.delete(`/api/admin/questions/${questionId}`);
       setQuestions(questions.filter(q => q.question_id !== questionId));
       toast({
         title: "Question deleted.",

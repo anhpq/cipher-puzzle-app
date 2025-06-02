@@ -22,7 +22,6 @@ const StageStep = ({
   teamId,
   isStageOne,
   onAdvance,
-  config,
   initialVerified = false,
 }) => {
   const [verified, setVerified] = useState(initialVerified);
@@ -64,7 +63,6 @@ const StageStep = ({
   const fetchHintTimers = async () => {
     try {
       const response = await API.get(`/api/team-progress/get-hint`, {
-        ...config,
         params: {
           stage_id: stage.stageId,
           question_id: stage.questionId
@@ -93,14 +91,13 @@ const StageStep = ({
         {
           stage_id: stage.stageId,
           open_code: openCodeInput,
-        },
-        config
+        }
       );
       if (response.data.success) {
         setVerified(true);
         setSubmitMessage("Valid open code! Please enter your answer.");
         if (isStageOne && typeof onAdvance === "function") {
-          await API.put(`/api/team-progress/start-time`, {}, config);
+          await API.put(`/api/team-progress/start-time`, {});
           if (typeof onAdvance === "function") onAdvance();
         }
       }
@@ -117,11 +114,10 @@ const StageStep = ({
           stage_id: stage.stageId,
           question_id: stage.questionId,
           answer: answerInput,
-        },
-        config
+        }
       );
       if (response.data.success) {
-        await API.put(`/api/team-progress/advance-stage`, { stage_id: stage.stageId }, config);
+        await API.put(`/api/team-progress/advance-stage`, { stage_id: stage.stageId });
         setSubmitMessage("Correct answer! Stage completed.");
         if (typeof onAdvance === "function") onAdvance();
       }
@@ -133,7 +129,6 @@ const StageStep = ({
   const fetchHint = async () => {
     try {
       const response = await API.get(`/api/team-progress/get-hint`, {
-        ...config,
         params: {
           stage_id: stage.stageId,
           question_id: stage.questionId
@@ -157,7 +152,7 @@ const StageStep = ({
 
   useEffect(() => {
     if (isFinalStage && verified) {
-      API.get(`/api/team-progress/total-time`, config)
+      API.get(`/api/team-progress/total-time`)
         .then(res => {
           if (res.data && res.data.total_seconds != null) {
             const minutes = Math.floor(res.data.total_seconds / 60);
