@@ -22,7 +22,9 @@ router.post("/login", async (req, res) => {
   if (username.toLowerCase() === "admin") {
     if (password === process.env.ADMIN_PASSWORD) {
       req.session.admin = true;
-      console.log("Admin login successful", req.session.admin);
+      console.log("req.session.admin", req.session.admin);
+      console.log("Session after login:", req.session);
+      res.cookie("debug-cookie", "test", { httpOnly: false });
       return res.json({ message: "Admin login successful.", role: "admin" });
     } else {
       return res.status(401).json({ error: "Invalid admin credentials." });
@@ -45,7 +47,10 @@ router.post("/login", async (req, res) => {
     if (password === team.password) {
       req.session.team = true;
       req.session.teamId = team.team_id;
-      console.log("Admin login successful", req.session.admin, team.team_id);
+      console.log("Session after login:", req.session);
+      console.log("req.session.team:", req.session.team);
+      console.log("req.session.teamId:", req.session.teamId);
+      res.cookie("debug-cookie", "test", { httpOnly: false });
       return res.json({ message: "Team login successful.", role: "team" });
     } else {
       return res.status(401).json({ error: "Invalid team credentials." });
