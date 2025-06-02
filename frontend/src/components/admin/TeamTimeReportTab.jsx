@@ -35,7 +35,7 @@ const TeamTimeReportTab = ({ config }) => {
   const fetchReport = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API}/api/admin/reports/team-time`, config);
+      const response = await API.get(`/api/admin/reports/team-time`, config);
       setReports(response.data);
     } catch (err) {
       setError(err.response?.data?.error || "Error fetching report data");

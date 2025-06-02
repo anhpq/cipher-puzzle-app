@@ -14,7 +14,7 @@ const TeamDashboard = () => {
 
   const fetchTeamInfo = async () => {
     try {
-      const response = await axios.get(`${API}/api/team-info/info`, config);
+      const response = await API.get(`/api/team-info/info`, config);
       setTeamInfo(response.data);
       setLoading(false);
     } catch (err) {

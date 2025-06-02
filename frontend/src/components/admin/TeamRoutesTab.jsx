@@ -44,7 +44,7 @@ const TeamRoutesTab = ({ config }) => {
   const fetchAggregatedRoutes = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API}/api/admin/team-routes/aggregate`, config);
+      const response = await API.get(`/api/admin/team-routes/aggregate`, config);
       // Endpoint trả về dữ liệu dạng:
       // [
       //   { team_id: "1", routes: [ { team_route_id, team_id, stage_id, route_order, stage_name }, ... ] },
@@ -84,8 +84,8 @@ const TeamRoutesTab = ({ config }) => {
       .map(Number);
     try {
       // PUT /api/admin/team-routes/aggregate/:team_id với body { routes: routeArray }
-      await axios.put(
-        `${API}/api/admin/team-routes/aggregate/${editingTeamRoute.team_id}`,
+      await API.put(
+        `/api/admin/team-routes/aggregate/${editingTeamRoute.team_id}`,
         { routes: routeArray },
         config
       );
@@ -99,7 +99,7 @@ const TeamRoutesTab = ({ config }) => {
   const handleDeleteTeamRoute = async (team_id) => {
     try {
       // DELETE /api/admin/team-routes/aggregate/:team_id
-      await axios.delete(`${API}/api/admin/team-routes/aggregate/${team_id}`, config);
+      await API.delete(`/api/admin/team-routes/aggregate/${team_id}`, config);
       fetchAggregatedRoutes();
     } catch (err) {
       console.error("Error deleting aggregated team route:", err);

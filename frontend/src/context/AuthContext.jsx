@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const verifyAuth = async () => {
     console.log("🔍 verifyAuth called");
     try {
-      const response = await axios.get(`${API}/api/verify`, config);
+      const response = await API.get(`/api/verify`, config);
       console.log("✅ Authentication verification response:", response.data);
       setAuth({
         isAuthenticated: response.data.isAuthenticated,

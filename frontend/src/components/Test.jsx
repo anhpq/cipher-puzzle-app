@@ -6,8 +6,8 @@ import { Box, Button } from "@chakra-ui/react";
 function TestSession() {
   const login = async () => {
     try {
-      const res = await axios.post(
-        `${API}/api/test-login`,
+      const res = await API.post(
+        `/api/test-login`,
         {},
         { withCredentials: true }
       );
@@ -19,7 +19,7 @@ function TestSession() {
 
   const verify = async () => {
     try {
-      const res = await axios.get(`${API}/api/test-verify`, {
+      const res = await API.get(`/api/test-verify`, {
         withCredentials: true,
       });
       console.log("Verify response:", res.data);

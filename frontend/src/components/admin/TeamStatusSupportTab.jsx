@@ -28,7 +28,7 @@ const TeamStatusSupportTab = ({ config }) => {
     setLoading(true);
     try {
       // Giả sử endpoint trả về mảng đối tượng gồm: team_id, team_name, current_stage_id, stage_name
-      const response = await axios.get(`${API}/api/admin/teams/status`, config);
+      const response = await API.get(`/api/admin/teams/status`, config);
       setTeams(response.data);
     } catch (err) {
       setError(err.response?.data?.error || "Lỗi khi tải dữ liệu trạng thái team");
@@ -44,8 +44,8 @@ const TeamStatusSupportTab = ({ config }) => {
   // Xử lý Refresh Stage
   const handleRefresh = async (team_id, current_stage_id) => {
     try {
-      await axios.put(
-        `${API}/api/admin/support/refresh`,
+      await API.put(
+        `/api/admin/support/refresh`,
         { team_id, stage_id: current_stage_id },
         config
       );
@@ -60,8 +60,8 @@ const TeamStatusSupportTab = ({ config }) => {
   // Xử lý Advance Stage (chuyển sang stage tiếp theo)
   const handleAdvance = async (team_id, current_stage_id) => {
     try {
-      await axios.put(
-        `${API}/api/admin/support/advance`,
+      await API.put(
+        `/api/admin/support/advance`,
         { team_id, stage_id: current_stage_id },
         config
       );

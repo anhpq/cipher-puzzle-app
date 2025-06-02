@@ -29,7 +29,7 @@ const TeamDashboardWizard = ({ config, teamId, onAdvance }) => {
 
   const fetchStages = async () => {
     try {
-      const response = await axios.get(`${API}/api/team-progress/current-stages`, config);
+      const response = await API.get(`/api/team-progress/current-stages`, config);
       setStages(response.data);
       const index = response.data.findIndex(s => s.open_code_verified === true);
       setActiveStep(index === -1 ? 0 : index);

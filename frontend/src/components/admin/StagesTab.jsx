@@ -63,7 +63,7 @@ const StagesTab = ({ config }) => {
   const fetchStages = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API}/api/admin/stages`, config);
+      const response = await API.get(`/api/admin/stages`, config);
       setStages(response.data);
       console.log("Fetched stages:", response.data);
     } catch (err) {
@@ -95,7 +95,7 @@ const StagesTab = ({ config }) => {
       if (newLocationImage) {
         formData.append("location_image", newLocationImage);
       }
-      const response = await axios.post(`${API}/api/admin/stages`, formData, {
+      const response = await API.post(`/api/admin/stages`, formData, {
         ...config,
         headers: { 'Content-Type': 'multipart/form-data' },
       });
@@ -154,8 +154,8 @@ const StagesTab = ({ config }) => {
       if (editingLocationImage) {
         formData.append("location_image", editingLocationImage);
       }
-      const response = await axios.put(
-        `${API}/api/admin/stages/${editingStage.stage_id}`,
+      const response = await API.put(
+        `/api/admin/stages/${editingStage.stage_id}`,
         formData,
         {
           ...config,
@@ -194,7 +194,7 @@ const StagesTab = ({ config }) => {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`${API}/api/admin/stages/${stageToDelete.stage_id}`, config);
+      await API.delete(`/api/admin/stages/${stageToDelete.stage_id}`, config);
       setStages(stages.filter((s) => s.stage_id !== stageToDelete.stage_id));
       toast({
         title: "Stage deleted.",
