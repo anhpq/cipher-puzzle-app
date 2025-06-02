@@ -29,8 +29,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    verifyAuth();
+  useEffect(async () => {
+    await verifyAuth();
   }, []);
 
   const refreshAuth = async () => {
