@@ -13,7 +13,7 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
-        ? "https://cipher-puzzle-app.vercel.app"
+        ? process.env.FE
         : true,
     credentials: true,
   })
