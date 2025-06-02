@@ -31,6 +31,7 @@ const pgPool = new pg.Pool({
       : false, // nếu dùng SSL trên prod
 });
 
+console.log("Postgres pool created");
 // Configure express-session with a maximum age of 2 days (in milliseconds)
 app.use(
   session({
@@ -49,7 +50,6 @@ app.use(
     },
   })
 );
-
 // Load routes
 const authRoutes = require("./routes/auth");
 app.use("/api", authRoutes);
