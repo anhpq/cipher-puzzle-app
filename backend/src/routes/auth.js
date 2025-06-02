@@ -75,11 +75,9 @@ router.post("/logout", (req, res) => {
 });
 
 router.get("/verify", (req, res) => {
-  console.log("Verify session ID:", req.sessionID);
-  console.log("Verify session content:", req.session);
-  console.log("req.session.user:", req.session.user);
-  console.log("req.session.admin:", req.session.admin);
-  console.log("req.session.team:", req.session.team);
+  console.log("🔐 Session ID:", req.sessionID);
+  console.log("🔐 req.session.admin:", req.session.admin);
+  console.log("🔐 Full session:", req.session);
   if (req.session && req.session.admin) {
     return res.json({ isAuthenticated: true, role: "admin" });
   } else if (req.session && req.session.team) {
