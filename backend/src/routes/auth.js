@@ -43,9 +43,9 @@ router.post("/login", async (req, res) => {
 
     // Giả sử ở đây password đang lưu plain text (chỉ để phát triển)
     if (password === team.password) {
-      console.log("Admin login successful", req.session.admin, team.team_id);
       req.session.team = true;
       req.session.teamId = team.team_id;
+      console.log("Admin login successful", req.session.admin, team.team_id);
       return res.json({ message: "Team login successful.", role: "team" });
     } else {
       return res.status(401).json({ error: "Invalid team credentials." });
@@ -70,7 +70,6 @@ router.post("/logout", (req, res) => {
 });
 
 router.get("/verify", (req, res) => {
-  console.log("Session data:", req.session);
   console.log("Verifying authentication:", req.session.admin, req.session.team);
   if (req.session && req.session.admin) {
     return res.json({ isAuthenticated: true, role: "admin" });
