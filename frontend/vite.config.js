@@ -9,6 +9,7 @@ export default defineConfig({
   },
   preview: {
     port: parseInt(process.env.PORT) || 4173,
-    host: true // ❗ Bắt buộc để cho Railway nhận kết nối bên ngoài
+    host: true,
+    allowedHosts: ['cipher-puzzle-frontend.up.railway.app'],
   },
 });
