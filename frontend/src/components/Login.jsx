@@ -13,6 +13,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import API from '../api';
+import TestSession from './Test';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -82,6 +83,8 @@ function Login() {
           Login
         </Button>
       </form>
+
+      <TestSession></TestSession>
     </Box>
   );
 }

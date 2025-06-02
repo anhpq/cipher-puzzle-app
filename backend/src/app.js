@@ -48,7 +48,6 @@ app.use(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      domain: process.env.NODE_ENV === "production" ? ".up.railway.app" : undefined,
       maxAge: 2 * 24 * 60 * 60 * 1000,
     },
   })
@@ -97,4 +96,23 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+});
+
+
+
+// route test login dummy (login giả)
+app.post('/api/test-login', (req, res) => {
+  req.session.admin = true; // hoặc req.session.user = 'admin'
+  res.json({ message: 'Logged in', sessionID: req.sessionID });
+});
+
+// route test verify session
+app.get('/api/test-verify', (req, res) => {
+  console.log("🔐 Session ID verify:", req.sessionID);
+  console.log("🔐 Session content:", req.session);
+  res.json({
+    isAuthenticated: !!req.session.admin,
+    sessionID: req.sessionID,
+    session: req.session,
+  });
 });
