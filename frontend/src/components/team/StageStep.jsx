@@ -1,5 +1,5 @@
 // StageStep.jsx (updated UI, hint logic, game completion)
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Heading,
@@ -12,10 +12,10 @@ import {
   useColorModeValue,
   Fade,
   Image,
-  HStack
-} from '@chakra-ui/react';
-import axios from 'axios';
-import API from '../../api';
+  HStack,
+} from "@chakra-ui/react";
+import axios from "axios";
+import API from "../../api";
 
 const StageStep = ({
   stage,
@@ -31,10 +31,13 @@ const StageStep = ({
   const [hintCountdown, setHintCountdown] = useState(null);
   const [hintData, setHintData] = useState({ hint1: null, hint2: null });
   const [hintTimers, setHintTimers] = useState({ hint1: 360, hint2: 720 });
-  const [hintEnabled, setHintEnabled] = useState({ hint1: false, hint2: false });
+  const [hintEnabled, setHintEnabled] = useState({
+    hint1: false,
+    hint2: false,
+  });
   const [totalTime, setTotalTime] = useState(null);
 
-  const cardBg = useColorModeValue('gray.50', 'gray.700');
+  const cardBg = useColorModeValue("gray.50", "gray.700");
 
   useEffect(() => {
     fetchHintTimers();
@@ -42,16 +45,16 @@ const StageStep = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setHintTimers(prevTimers => {
+      setHintTimers((prevTimers) => {
         const updated = { ...prevTimers };
         if (updated.hint1 > 0) updated.hint1--;
         if (updated.hint2 > 0) updated.hint2--;
 
         if (updated.hint1 === 0) {
-          setHintEnabled(prev => ({ ...prev, hint1: true }));
+          setHintEnabled((prev) => ({ ...prev, hint1: true }));
         }
         if (updated.hint2 === 0) {
-          setHintEnabled(prev => ({ ...prev, hint2: true }));
+          setHintEnabled((prev) => ({ ...prev, hint2: true }));
         }
 
         return updated;
@@ -65,8 +68,8 @@ const StageStep = ({
       const response = await API.get(`/api/team-progress/get-hint`, {
         params: {
           stage_id: stage.stageId,
-          question_id: stage.questionId
-        }
+          question_id: stage.questionId,
+        },
       });
       if (response.data.success) {
         const elapsed = response.data.hint.elapsedSeconds || 0;
@@ -76,23 +79,18 @@ const StageStep = ({
         });
         setHintEnabled({
           hint1: elapsed >= 360,
-          hint2: elapsed >= 720
+          hint2: elapsed >= 720,
         });
       }
-
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   const handleVerifyOpenCode = async () => {
     try {
-      const response = await API.post(
-        `/api/team-progress/verify-open-code`,
-        {
-          stage_id: stage.stageId,
-          open_code: openCodeInput,
-        }
-      );
+      const response = await API.post(`/api/team-progress/verify-open-code`, {
+        stage_id: stage.stageId,
+        open_code: openCodeInput,
+      });
       if (response.data.success) {
         setVerified(true);
         setSubmitMessage("Valid open code! Please enter your answer.");
@@ -102,22 +100,23 @@ const StageStep = ({
         }
       }
     } catch (error) {
-      setSubmitMessage(error.response?.data?.message || "Invalid open code. Please try again.");
+      setSubmitMessage(
+        error.response?.data?.message || "Invalid open code. Please try again."
+      );
     }
   };
 
   const handleSubmitAnswer = async () => {
     try {
-      const response = await API.post(
-        `/api/team-progress/submit-answer`,
-        {
-          stage_id: stage.stageId,
-          question_id: stage.questionId,
-          answer: answerInput,
-        }
-      );
+      const response = await API.post(`/api/team-progress/submit-answer`, {
+        stage_id: stage.stageId,
+        question_id: stage.questionId,
+        answer: answerInput,
+      });
       if (response.data.success) {
-        await API.put(`/api/team-progress/advance-stage`, { stage_id: stage.stageId });
+        await API.put(`/api/team-progress/advance-stage`, {
+          stage_id: stage.stageId,
+        });
         setSubmitMessage("Correct answer! Stage completed.");
         if (typeof onAdvance === "function") onAdvance();
       }
@@ -131,14 +130,14 @@ const StageStep = ({
       const response = await API.get(`/api/team-progress/get-hint`, {
         params: {
           stage_id: stage.stageId,
-          question_id: stage.questionId
-        }
+          question_id: stage.questionId,
+        },
       });
       if (response.data.success) {
         const available = response.data.hint || {};
         setHintData({
           hint1: available.hint1 || false,
-          hint2: available.hint2 || false
+          hint2: available.hint2 || false,
         });
       } else {
         setSubmitMessage(response.data.message || "Hint not available yet.");
@@ -153,7 +152,7 @@ const StageStep = ({
   useEffect(() => {
     if (isFinalStage && verified) {
       API.get(`/api/team-progress/total-time`)
-        .then(res => {
+        .then((res) => {
           if (res.data && res.data.total_seconds != null) {
             const minutes = Math.floor(res.data.total_seconds / 60);
             const seconds = res.data.total_seconds % 60;
@@ -166,7 +165,14 @@ const StageStep = ({
 
   return (
     <Fade in>
-      <Box p={6} bg={cardBg} borderRadius="lg" boxShadow="md" textAlign="center" mb={6}>
+      <Box
+        p={6}
+        bg={cardBg}
+        borderRadius="lg"
+        boxShadow="md"
+        textAlign="center"
+        mb={6}
+      >
         <Heading size="lg" mb={4} color="purple.600">
           Stage {stage.stageNumber}
         </Heading>
@@ -193,15 +199,21 @@ const StageStep = ({
               </Alert>
             )}
             <Box mt={4}>
-              <Text fontSize="large" mb={4} color="purple.600">Find the location</Text>
-              <Image src={`data:image/png;base64,${stage.location_image}`} maxW="400px" mx="auto" />
+              <Text fontSize="large" mb={4} color="purple.600">
+                Find the location
+              </Text>
+              <Image
+                src={`data:image/png;base64,${stage.location_image}`}
+                maxW="400px"
+                mx="auto"
+              />
             </Box>
           </VStack>
         ) : isFinalStage ? (
           <Alert status="success" mt={4} borderRadius="md">
             <AlertIcon />
-            🎉 Congratulations! You have completed all stages in {totalTime || '...'}.
-            Please return to the gathering point.
+            🎉 Congratulations! You have completed all stages in{" "}
+            {totalTime || "..."}. Please return to the gathering point.
           </Alert>
         ) : (
           <VStack spacing={4}>
@@ -219,10 +231,18 @@ const StageStep = ({
               Submit Answer
             </Button>
             <HStack spacing={4} justify="center">
-              <Button onClick={() => fetchHint('hint1')} colorScheme="orange" isDisabled={!hintEnabled.hint1}>
+              <Button
+                onClick={() => fetchHint("hint1")}
+                colorScheme="orange"
+                isDisabled={!hintEnabled.hint1}
+              >
                 Hint 1 {hintTimers.hint1 > 0 ? `(${hintTimers.hint1}s)` : ""}
               </Button>
-              <Button onClick={() => fetchHint('hint2')} colorScheme="orange" isDisabled={!hintEnabled.hint2}>
+              <Button
+                onClick={() => fetchHint("hint2")}
+                colorScheme="orange"
+                isDisabled={!hintEnabled.hint2}
+              >
                 Hint 2 {hintTimers.hint2 > 0 ? `(${hintTimers.hint2}s)` : ""}
               </Button>
             </HStack>
@@ -230,14 +250,26 @@ const StageStep = ({
               <Box mt={4}>
                 {hintData.hint1 && (
                   <Box>
-                    <Text fontWeight="bold" mb={1}>Hint 1:</Text>
-                    <Image src={`data:image/png;base64,${hintData.hint1}`} maxW="200px" mx="auto" />
+                    <Text fontWeight="bold" mb={1}>
+                      Hint 1:
+                    </Text>
+                    <Image
+                      src={`data:image/png;base64,${hintData.hint1}`}
+                      maxW="200px"
+                      mx="auto"
+                    />
                   </Box>
                 )}
                 {hintData.hint2 && (
                   <Box mt={4}>
-                    <Text fontWeight="bold" mb={1}>Hint 2:</Text>
-                    <Image src={`data:image/png;base64,${hintData.hint2}`} maxW="200px" mx="auto" />
+                    <Text fontWeight="bold" mb={1}>
+                      Hint 2:
+                    </Text>
+                    <Image
+                      src={`data:image/png;base64,${hintData.hint2}`}
+                      maxW="200px"
+                      mx="auto"
+                    />
                   </Box>
                 )}
               </Box>
