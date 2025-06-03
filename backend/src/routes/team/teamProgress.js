@@ -309,7 +309,7 @@ router.get("/total-time", teamAuth, async (req, res) => {
           MAX(tr.completed_at) - MIN(tp.start_time)
         )) AS total_seconds
       FROM team_routes tr
-      JOIN team_progress tp ON tr.team_id = tp.team_id
+      JOIN teams t ON tr.team_id = t.team_id
       WHERE tr.team_id = $1 AND tr.completed = true
     `;
     const result = await db.query(query, [teamId]);
