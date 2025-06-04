@@ -49,6 +49,7 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(0);
   const [animating, setAnimating] = useState(false);
+  const [gameFinished, setGameFinished] = useState(false);
 
   // Enhanced color scheme
   const bg = useColorModeValue("gray.50", "gray.900");
@@ -62,10 +63,28 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
     try {
       const response = await API.get(`/api/team-progress/current-stages`);
       const data = response.data;
-      setStages(data);
 
-      const index = data.findIndex((stage) => stage.completed === false);
-      setActiveStep(index === -1 ? data.length - 1 : index);
+      // Filter out stage 8 early to avoid confusion
+      const validStages = data.filter((s) => s.stageNumber !== 8);
+      setStages(validStages);
+
+      // Check if game is finished
+      const allCompleted = validStages.every(
+        (stage) => stage.completed === true
+      );
+      setGameFinished(allCompleted);
+
+      if (allCompleted) {
+        // When game is finished, set active step to the last completed stage
+        setActiveStep(validStages.length - 1);
+      } else {
+        // Find the first incomplete stage
+        const index = validStages.findIndex(
+          (stage) => stage.completed === false
+        );
+        setActiveStep(index === -1 ? validStages.length - 1 : index);
+      }
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching stages:", error);
@@ -92,29 +111,28 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
     return (
       <Container maxW="4xl" py={20}>
         <VStack spacing={8}>
-          <Box position="relative">
-            <Spinner size="xl" color="blue.500" thickness="4px" speed="0.8s" />
-            <Box
-              position="absolute"
-              top="50%"
-              left="50%"
-              transform="translate(-50%, -50%)"
-            >
-              <Icon as={FaRocket} boxSize="20px" color="blue.500" />
-            </Box>
+          <Spinner size="xl" color="blue.500" thickness="4px" speed="0.8s" />
+          <Box
+            position="absolute"
+            top="50%"
+            left="50%"
+            transform="translate(-50%, -50%)"
+          >
+            <Icon as={FaRocket} boxSize="20px" color="blue.500" />
           </Box>
-          <VStack spacing={2}>
-            <Text fontSize="xl" fontWeight="semibold" color={accentColor}>
-              Loading Adventure...
-            </Text>
-            <Text color={textColor}>Preparing your quest</Text>
-          </VStack>
+        </VStack>
+        <VStack spacing={2}>
+          <Text fontSize="xl" fontWeight="semibold" color={accentColor}>
+            Loading Adventure...
+          </Text>
+          <Text color={textColor}>Preparing your quest</Text>
         </VStack>
       </Container>
     );
   }
 
-  const stagesToShow = stages.filter((s) => s.stageNumber !== 8);
+  // Use stages directly since we already filtered out stage 8
+  const stagesToShow = stages;
 
   // Calculate progress
   const completedStages = stagesToShow.filter((s) => s.completed).length;
@@ -130,6 +148,21 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
     const startIndex = Math.max(activeStep - 1, 0);
     const endIndex = Math.min(activeStep + 1, stagesToShow.length - 1);
     visibleStages = stagesToShow.slice(startIndex, endIndex + 1);
+  }
+
+  // Ensure we have a valid stage to show
+  const currentStage = stages[activeStep];
+  if (!currentStage) {
+    return (
+      <Container maxW="4xl" py={20}>
+        <VStack spacing={8}>
+          <Text fontSize="xl" fontWeight="semibold" color={accentColor}>
+            No stages available
+          </Text>
+          <Text color={textColor}>Please contact admin for assistance</Text>
+        </VStack>
+      </Container>
+    );
   }
 
   return (
@@ -244,7 +277,7 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
                             </Badge>
                           </VStack>
                         </Box>
-                        <StepSeparator marginBottom={50}/>
+                        <StepSeparator marginBottom={50} />
                       </Step>
                     );
                   })}
@@ -254,17 +287,15 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
           </Box>
 
           {/* Stage Content */}
-          <Fade in={!animating} key={stages[activeStep]?.stageId}>
+          <Fade in={!animating} key={currentStage.stageId}>
             <Box w="100%">
-              {stages[activeStep] && (
-                <StageStep
-                  stage={stages[activeStep]}
-                  teamId={teamId}
-                  isStageOne={stages[activeStep].stageNumber === 1}
-                  onAdvance={handleAdvance}
-                  initialVerified={stages[activeStep].open_code_verified}
-                />
-              )}
+              <StageStep
+                stage={currentStage}
+                teamId={teamId}
+                isStageOne={currentStage.stageNumber === 1}
+                onAdvance={handleAdvance}
+                initialVerified={currentStage.open_code_verified}
+              />
             </Box>
           </Fade>
 

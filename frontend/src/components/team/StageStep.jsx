@@ -1,3 +1,4 @@
+// Solution 1: Add a transitioning state to prevent flickering
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -18,6 +19,7 @@ import {
   Icon,
   Divider,
   ScaleFade,
+  Spinner,
 } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 import {
@@ -78,6 +80,9 @@ const StageStep = ({
     hint2: false,
   });
   const [totalTime, setTotalTime] = useState(null);
+  
+  // Add transitioning state to prevent flickering
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Enhanced color scheme
   const cardBg = useColorModeValue("white", "gray.800");
@@ -89,7 +94,7 @@ const StageStep = ({
   const textColor = useColorModeValue("gray.700", "gray.200");
   const accentColor = useColorModeValue("blue.600", "blue.300");
 
-  // All your existing useEffect hooks and functions remain the same
+  // All your existing useEffect hooks remain the same
   useEffect(() => {
     checkGameStatus();
   }, []);
@@ -208,6 +213,7 @@ const StageStep = ({
     }
   };
 
+  // Modified handleSubmitAnswer with transition state
   const handleSubmitAnswer = async () => {
     try {
       const response = await API.post(`/api/team-progress/submit-answer`, {
@@ -215,6 +221,7 @@ const StageStep = ({
       });
       if (response.data.success) {
         setSubmitMessage("Correct answer!");
+        
         if (nextStage && nextStage.isFinal) {
           setSubmitMessage(
             "Awesome job! You've completed all stages. Please head back to the starting area."
@@ -230,20 +237,59 @@ const StageStep = ({
             .catch(() => setTotalTime(null));
           setGameFinished(true);
         } else {
+          // Start transitioning before making state changes
+          setIsTransitioning(true);
+          
           await API.put(`/api/team-progress/advance-stage`, {
             stage_id: stage.stageId,
           });
+          
+          // Clear state first
+          setSubmitMessage("");
           setVerified(false);
           setNextStage(null);
           setOpenCodeInput("");
           setAnswerInput("");
-          if (typeof onAdvance === "function") onAdvance();
+          
+          // Call onAdvance and wait for it to complete
+          if (typeof onAdvance === "function") {
+            await onAdvance();
+          }
+          
+          // Small delay to ensure parent component updates
+          setTimeout(() => {
+            setIsTransitioning(false);
+          }, 100);
         }
       }
     } catch (error) {
       setSubmitMessage(error.response?.data?.message || "Wrong answer.");
     }
   };
+
+  // Show loading state during transition
+  if (isTransitioning) {
+    return (
+      <Container maxW="4xl" py={6}>
+        <Box
+          bgGradient={gradientBg}
+          borderRadius="2xl"
+          boxShadow="2xl"
+          p={8}
+          border="2px solid"
+          borderColor={borderColor}
+          textAlign="center"
+        >
+          <VStack spacing={6}>
+            <Spinner size="xl" color="blue.500" thickness="4px" />
+            <Text fontSize="lg" color={textColor}>
+              Loading next stage...
+            </Text>
+          </VStack>
+        </Box>
+      </Container>
+    );
+  }
 
   // Enhanced final congratulatory screen
   if (gameFinished) {
