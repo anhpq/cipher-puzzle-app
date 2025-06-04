@@ -1,5 +1,5 @@
+// frontend/src/components/AuthContext.jsx
 import React, { createContext, useState, useEffect } from "react";
-import axios from "axios";
 import API from "../api";
 
 const AuthContext = createContext();
@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
       await verifyAuth();
     };
     checkAuth();
+    verifyAuth();
   }, []);
 
   const refreshAuth = async () => {

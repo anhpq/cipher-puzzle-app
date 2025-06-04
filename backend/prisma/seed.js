@@ -77,123 +77,139 @@ async function main() {
         open_code: "7777",
         location_image: loadImage("7.png"),
       },
+      {
+        stage_number: 8,
+        stage_name: "Trạm Sân Khấu",
+        description: "All",
+        open_code: "8888",
+        location_image: loadImage("7.png"),
+      },
     ],
   });
 
   // Insert Questions
   await prisma.questions.createMany({
     data: [
-      // Stage 1
+      // Stage 1 - Warm Up
       {
         stage_id: 1,
-        question_text: "Answer1.1",
+        question_text: "Warm Up - Answer1.1",
         answer: "Answer1.1",
         hint1: loadImage("1.png"),
         hint2: loadImage("1.png"),
       },
       {
         stage_id: 1,
-        question_text: "Answer1.2",
+        question_text: "Warm Up - Answer1.2",
         answer: "Answer1.2",
         hint1: loadImage("1.png"),
         hint2: loadImage("1.png"),
       },
 
-      // Stage 2
+      // Stage 2 - Trạm Mê Cung
       {
         stage_id: 2,
-        question_text: "Answer2.1",
+        question_text: "Trạm Mê Cung - Answer2.1",
         answer: "Answer2.1",
-        hint1: loadImage("1.png"),
-        hint2: loadImage("1.png"),
+        hint1: loadImage("2.png"),
+        hint2: loadImage("2.png"),
       },
       {
         stage_id: 2,
-        question_text: "Answer2.2",
+        question_text: "Trạm Mê Cung - Answer2.2",
         answer: "Answer2.2",
-        hint1: loadImage("1.png"),
-        hint2: loadImage("1.png"),
+        hint1: loadImage("2.png"),
+        hint2: loadImage("2.png"),
       },
 
-      // Stage 3
+      // Stage 3 - Trạm Rắn
       {
         stage_id: 3,
-        question_text: "Answer3.1",
+        question_text: "Trạm Rắn - Answer3.1",
         answer: "Answer3.1",
-        hint1: loadImage("1.png"),
-        hint2: loadImage("1.png"),
+        hint1: loadImage("3.png"),
+        hint2: loadImage("3.png"),
       },
       {
         stage_id: 3,
-        question_text: "Answer3.2",
+        question_text: "Trạm Rắn - Answer3.2",
         answer: "Answer3.2",
-        hint1: loadImage("1.png"),
-        hint2: loadImage("1.png"),
+        hint1: loadImage("3.png"),
+        hint2: loadImage("3.png"),
       },
 
-      // Stage 4
+      // Stage 4 - Trạm Liên Hoàn
       {
         stage_id: 4,
-        question_text: "Answer4.1",
+        question_text: "Trạm Liên Hoàn - Answer4.1",
         answer: "Answer4.1",
-        hint1: loadImage("1.png"),
-        hint2: loadImage("1.png"),
+        hint1: loadImage("4.png"),
+        hint2: loadImage("4.png"),
       },
       {
         stage_id: 4,
-        question_text: "Answer4.2",
+        question_text: "Trạm Liên Hoàn - Answer4.2",
         answer: "Answer4.2",
-        hint1: loadImage("1.png"),
-        hint2: loadImage("1.png"),
+        hint1: loadImage("4.png"),
+        hint2: loadImage("4.png"),
       },
 
-      // Stage 5
+      // Stage 5 - Trạm Vòng Xoay
       {
         stage_id: 5,
-        question_text: "Answer5.1",
+        question_text: "Trạm Vòng Xoay - Answer5.1",
         answer: "Answer5.1",
-        hint1: loadImage("1.png"),
-        hint2: loadImage("1.png"),
+        hint1: loadImage("5.png"),
+        hint2: loadImage("5.png"),
       },
       {
         stage_id: 5,
-        question_text: "Answer5.2",
+        question_text: "Trạm Vòng Xoay - Answer5.2",
         answer: "Answer5.2",
-        hint1: loadImage("1.png"),
-        hint2: loadImage("1.png"),
+        hint1: loadImage("5.png"),
+        hint2: loadImage("5.png"),
       },
 
-      // Stage 6
+      // Stage 6 - Trạm Cá Sấu
       {
         stage_id: 6,
-        question_text: "Answer6.1",
+        question_text: "Trạm Cá Sấu - Answer6.1",
         answer: "Answer6.1",
-        hint1: loadImage("1.png"),
-        hint2: loadImage("1.png"),
+        hint1: loadImage("6.png"),
+        hint2: loadImage("6.png"),
       },
       {
         stage_id: 6,
-        question_text: "Answer6.2",
+        question_text: "Trạm Cá Sấu - Answer6.2",
         answer: "Answer6.2",
-        hint1: loadImage("1.png"),
-        hint2: loadImage("1.png"),
+        hint1: loadImage("6.png"),
+        hint2: loadImage("6.png"),
       },
 
-      // Stage 7
+      // Stage 7 - Trạm Hồ
       {
         stage_id: 7,
-        question_text: "Answer7.1",
+        question_text: "Trạm Hồ - Answer7.1",
         answer: "Answer7.1",
-        hint1: loadImage("1.png"),
-        hint2: loadImage("1.png"),
+        hint1: loadImage("7.png"),
+        hint2: loadImage("7.png"),
       },
       {
         stage_id: 7,
-        question_text: "Answer7.2",
+        question_text: "Trạm Hồ - Answer7.2",
         answer: "Answer7.2",
+        hint1: loadImage("7.png"),
+        hint2: loadImage("7.png"),
+      },
+      
+      // Stage 8 - Finish Line
+      {
+        stage_id: 8,
+        question_text: "Finish Line - STMOVEMENT2025",
+        answer: "STMOVEMENT2025",
         hint1: loadImage("1.png"),
         hint2: loadImage("1.png"),
-      },
+      }
     ],
   });
 
@@ -208,6 +224,7 @@ async function main() {
       { team_id: 1, stage_id: 5, route_order: 5 },
       { team_id: 1, stage_id: 6, route_order: 6 },
       { team_id: 1, stage_id: 7, route_order: 7 },
+      { team_id: 1, stage_id: 8, route_order: 8 },
 
       // Team 2
       { team_id: 2, stage_id: 1, route_order: 1 },
@@ -217,6 +234,7 @@ async function main() {
       { team_id: 2, stage_id: 6, route_order: 5 },
       { team_id: 2, stage_id: 7, route_order: 6 },
       { team_id: 2, stage_id: 2, route_order: 7 },
+      { team_id: 2, stage_id: 8, route_order: 8 },
 
       // Team 3
       { team_id: 3, stage_id: 1, route_order: 1 },
@@ -226,6 +244,7 @@ async function main() {
       { team_id: 3, stage_id: 7, route_order: 5 },
       { team_id: 3, stage_id: 2, route_order: 6 },
       { team_id: 3, stage_id: 3, route_order: 7 },
+      { team_id: 3, stage_id: 8, route_order: 8 },
 
       // Team 4
       { team_id: 4, stage_id: 1, route_order: 1 },
@@ -235,6 +254,7 @@ async function main() {
       { team_id: 4, stage_id: 2, route_order: 5 },
       { team_id: 4, stage_id: 3, route_order: 6 },
       { team_id: 4, stage_id: 4, route_order: 7 },
+      { team_id: 4, stage_id: 8, route_order: 8 },
 
       // Team 5
       { team_id: 5, stage_id: 1, route_order: 1 },
@@ -244,6 +264,7 @@ async function main() {
       { team_id: 5, stage_id: 3, route_order: 5 },
       { team_id: 5, stage_id: 4, route_order: 6 },
       { team_id: 5, stage_id: 5, route_order: 7 },
+      { team_id: 5, stage_id: 8, route_order: 8 },
 
       // Team 6
       { team_id: 6, stage_id: 1, route_order: 1 },
@@ -253,6 +274,7 @@ async function main() {
       { team_id: 6, stage_id: 4, route_order: 5 },
       { team_id: 6, stage_id: 5, route_order: 6 },
       { team_id: 6, stage_id: 6, route_order: 7 },
+      { team_id: 6, stage_id: 8, route_order: 8 },
 
       // Team 7
       { team_id: 7, stage_id: 1, route_order: 1 },
@@ -262,6 +284,7 @@ async function main() {
       { team_id: 7, stage_id: 5, route_order: 5 },
       { team_id: 7, stage_id: 6, route_order: 6 },
       { team_id: 7, stage_id: 7, route_order: 7 },
+      { team_id: 7, stage_id: 8, route_order: 8 },
 
       // Team 8
       { team_id: 8, stage_id: 1, route_order: 1 },
@@ -271,6 +294,7 @@ async function main() {
       { team_id: 8, stage_id: 6, route_order: 5 },
       { team_id: 8, stage_id: 7, route_order: 6 },
       { team_id: 8, stage_id: 2, route_order: 7 },
+      { team_id: 8, stage_id: 8, route_order: 8 },
 
       // Team 9
       { team_id: 9, stage_id: 1, route_order: 1 },
@@ -280,6 +304,7 @@ async function main() {
       { team_id: 9, stage_id: 7, route_order: 5 },
       { team_id: 9, stage_id: 2, route_order: 6 },
       { team_id: 9, stage_id: 3, route_order: 7 },
+      { team_id: 9, stage_id: 8, route_order: 8 },
 
       // Team 10
       { team_id: 10, stage_id: 1, route_order: 1 },
@@ -289,6 +314,7 @@ async function main() {
       { team_id: 10, stage_id: 2, route_order: 5 },
       { team_id: 10, stage_id: 3, route_order: 6 },
       { team_id: 10, stage_id: 4, route_order: 7 },
+      { team_id: 10, stage_id: 8, route_order: 8 },
     ],
   });
 
@@ -378,6 +404,18 @@ async function main() {
       { team_id: 8, stage_id: 7, question_id: 14, attempts: 0 },
       { team_id: 9, stage_id: 7, question_id: 13, attempts: 0 },
       { team_id: 10, stage_id: 7, question_id: 14, attempts: 0 },
+
+      // Stage 8
+      { team_id: 1, stage_id: 8, question_id: 15, attempts: 0 },
+      { team_id: 2, stage_id: 8, question_id: 15, attempts: 0 },
+      { team_id: 3, stage_id: 8, question_id: 15, attempts: 0 },
+      { team_id: 4, stage_id: 8, question_id: 15, attempts: 0 },
+      { team_id: 5, stage_id: 8, question_id: 15, attempts: 0 },
+      { team_id: 6, stage_id: 8, question_id: 15, attempts: 0 },
+      { team_id: 7, stage_id: 8, question_id: 15, attempts: 0 },
+      { team_id: 8, stage_id: 8, question_id: 15, attempts: 0 },
+      { team_id: 9, stage_id: 8, question_id: 15, attempts: 0 },
+      { team_id: 10, stage_id: 8, question_id: 15, attempts: 0 },
     ],
   });
 }

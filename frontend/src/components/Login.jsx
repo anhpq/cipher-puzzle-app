@@ -1,3 +1,4 @@
+// frontend/src/components/Login.jsx
 import React, { useState, useContext } from "react";
 import {
   Box,
@@ -9,8 +10,7 @@ import {
   AlertIcon,
   Heading,
 } from "@chakra-ui/react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import API from "../api";
 
@@ -19,14 +19,23 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { refreshAuth } = useContext(AuthContext);
+  const { auth, refreshAuth } = useContext(AuthContext);
+
+  // Nếu đã đăng nhập rồi, chuyển ngay về dashboard tương ứng
+  if (!auth.loading && auth.isAuthenticated) {
+    if (auth.role === "admin") {
+      return <Navigate to="/admin/dashboard" replace />;
+    } else {
+      return <Navigate to="/team" replace />;
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await API.post(`/api/login`, { username, password });
 
-      // ✅ Chờ trình duyệt lưu cookie rồi mới verify
+      // Chờ cookie được lưu rồi mới refresh auth
       setTimeout(async () => {
         await refreshAuth();
 
