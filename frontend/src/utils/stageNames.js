@@ -13,7 +13,7 @@ export function getStageName(stageNumber) {
     case 6:
       return "Final Sprint";
     case 7:
-      return "FFinish Line";
+      return "Finish Line";
     default:
       return "Unknown Stage - Contact admin";
   }

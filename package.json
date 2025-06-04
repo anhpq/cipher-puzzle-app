@@ -7,9 +7,11 @@
     "db:setup": "npm run db:setup --prefix backend",
     "db:setup-old": "powershell -ExecutionPolicy Bypass -File ./database/db-setup.ps1",
     "start": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "build": "concurrently \"npm run start --prefix backend\" \"npm run build --prefix frontend\"",
     "i:all": "concurrently \"npm i\" \"npm audit fix --force\" \"npm i --prefix backend\" \"npm audit fix --force --prefix backend\" \"npm i --prefix frontend\" \"npm audit fix --force --prefix frontend\""
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
     "concurrently": "^8.2.0"
   }
 }
