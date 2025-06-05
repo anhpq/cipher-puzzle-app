@@ -1,10 +1,23 @@
+// preview.js
 const { exec } = require('child_process');
 
 const port = process.env.PORT || 4173;
-exec(`npx vite preview --port ${port} --host`, (err, stdout, stderr) => {
-  if (err) {
-    console.error(stderr);
-    process.exit(1);
-  }
-  console.log(stdout);
+
+const cmd = `npx vite preview --port ${port} --host`;
+
+console.log(`Starting vite preview server on port ${port}...`);
+
+const viteProcess = exec(cmd);
+
+viteProcess.stdout.on('data', (data) => {
+  process.stdout.write(data);
+});
+
+viteProcess.stderr.on('data', (data) => {
+  process.stderr.write(data);
+});
+
+viteProcess.on('close', (code) => {
+  console.log(`Vite preview process exited with code ${code}`);
+  process.exit(code);
 });
