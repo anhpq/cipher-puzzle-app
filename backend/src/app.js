@@ -13,8 +13,9 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
+      "https://cipher-puzzle-app.vercel.app",
       "https://cipher-puzzle-frontend.up.railway.app",
-      "https://cipher-puzzle-app.vercel.app", // nếu vẫn deploy song song trên Vercel
+      "https://cipher-puzzle-app.onrender.com/", // nếu vẫn deploy song song trên Vercel
     ],
     credentials: true,
   })
