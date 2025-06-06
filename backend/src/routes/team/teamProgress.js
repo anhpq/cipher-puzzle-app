@@ -178,7 +178,7 @@ router.post("/submit-answer", teamAuth, async (req, res) => {
       return res.status(404).json({ error: "Question not found." });
     }
     const correctAnswer = questionRes.rows[0].correct_answer;
-    if (answer.toLowerCase() !== correctAnswer.toLowerCase()) {
+    if (answer.trim().toLowerCase() !== correctAnswer.trim().toLowerCase()) {
       await db.query(
         `UPDATE team_question_assignments 
          SET attempts = attempts + 1, last_attempt_at = NOW() 
