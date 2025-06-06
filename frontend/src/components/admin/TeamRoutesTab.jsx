@@ -51,7 +51,6 @@ const TeamRoutesTab = () => {
       //   { team_id: "2", routes: [ ... ] },
       //   ...
       // ]
-      console.log("Aggregated Routes Response:", response.data);
       setGroupedRoutes(response.data);
     } catch (err) {
       setError(

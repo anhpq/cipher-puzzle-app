@@ -8,9 +8,9 @@ import {
   Alert,
   AlertIcon,
 } from "@chakra-ui/react";
-import axios from "axios";
 import TeamDashboardWizard from "./team/TeamDashboardWizard";
 import API from "../api";
+import { TeamThemeProvider } from "../utils/TeamThemeContext";
 
 const TeamDashboard = () => {
   const [teamInfo, setTeamInfo] = useState(null);
@@ -53,10 +53,12 @@ const TeamDashboard = () => {
               Game started at: {new Date(teamInfo.start_time).toLocaleString()}
             </Text>
           )}
-          <TeamDashboardWizard
-            teamId={teamInfo.team_id}
-            onAdvance={fetchTeamInfo}
-          />
+          <TeamThemeProvider teamId={teamInfo.team_id}>
+            <TeamDashboardWizard
+              teamId={teamInfo.team_id}
+              onAdvance={fetchTeamInfo}
+            />
+          </TeamThemeProvider>
         </>
       )}
     </Container>
