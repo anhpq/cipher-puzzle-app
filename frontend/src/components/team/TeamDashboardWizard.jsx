@@ -31,6 +31,9 @@ import {
 } from "react-icons/fa6";
 import StageStep from "./StageStep";
 import API from "../../api";
+import { getStageColor } from "../../utils/stageNames";
+import TeamBadge from "./TeamBadge";
+import { TeamThemeProvider } from "../../utils/TeamThemeContext";
 
 // Animation keyframes
 const pulse = keyframes`
@@ -51,6 +54,7 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
   const [animating, setAnimating] = useState(false);
   const [gameFinished, setGameFinished] = useState(false);
 
+  const teamColor = getStageColor(teamId);
   // Enhanced color scheme
   const bg = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
@@ -180,14 +184,17 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
             borderColor={useColorModeValue("blue.200", "blue.600")}
           >
             <VStack spacing={1}>
-              <Text
-                fontSize="lg"
-                fontWeight="bold"
-                color={accentColor}
-                textAlign="center"
-              >
-                🎯 Current Stage Path
-              </Text>
+              <HStack spacing={3}>
+                <TeamBadge teamId={teamId} variant="dot" />
+                <Text
+                  fontSize="lg"
+                  fontWeight="bold"
+                  color={accentColor}
+                  textAlign="center"
+                >
+                  🎯 Current Stage Path
+                </Text>
+              </HStack>
 
               <Box w="100%" overflowX="auto" pt={3}>
                 <Stepper
@@ -234,16 +241,16 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
                           <StepIndicator
                             bg={
                               isCompleted
-                                ? "blue.500"
+                                ? "green.500"
                                 : isActive
-                                ? "blue.500"
+                                ? teamColor // Sử dụng màu team cho active stage
                                 : "gray.300"
                             }
                             borderColor={
                               isCompleted
-                                ? "blue.600"
+                                ? "green.600"
                                 : isActive
-                                ? "blue.600"
+                                ? teamColor
                                 : "gray.400"
                             }
                             color="white"
@@ -255,6 +262,9 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
                             _hover={{ transform: "scale(1.1)" }}
                             transition="all 0.2s"
                             justifySelf={"center"}
+                            boxShadow={
+                              isActive ? `0 0 15px ${teamColor}60` : "none"
+                            }
                           >
                             {icon}
                           </StepIndicator>

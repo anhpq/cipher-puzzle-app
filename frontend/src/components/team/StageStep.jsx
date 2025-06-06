@@ -1,4 +1,4 @@
-// Fixed version with proper button state management
+// StageStep.jsx - Updated with Team Theme
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -34,6 +34,8 @@ import {
 import { CheckCircleIcon, TimeIcon } from "@chakra-ui/icons";
 import API from "../../api";
 import { getStageName } from "../../utils/stageNames";
+import TeamBadge from "./TeamBadge";
+import { useTeamTheme } from "../../utils/TeamThemeContext";
 
 // Animation keyframes
 const float = keyframes`
@@ -64,6 +66,9 @@ const StageStep = ({
   const HINT1_THRESHOLD = parseInt(import.meta.env.VITE_HINT_THRESHOLD);
   const HINT2_THRESHOLD = HINT1_THRESHOLD * 2;
 
+  // Team theme
+  const { colors, gradients, shadows, borders } = useTeamTheme();
+
   const [verified, setVerified] = useState(initialVerified);
   const [gameFinished, setGameFinished] = useState(false);
   const [nextStage, setNextStage] = useState(null);
@@ -87,16 +92,22 @@ const StageStep = ({
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [isLoadingHint, setIsLoadingHint] = useState(false);
 
-  // Enhanced color scheme
+  // Enhanced color scheme with team colors
   const cardBg = useColorModeValue("white", "gray.800");
   const gradientBg = useColorModeValue(
-    "linear(to-br, blue.50, blue.50, pink.50)",
-    "linear(to-br, blue.900, blue.900, pink.900)"
+    gradients.secondary,
+    `linear-gradient(to-br, ${colors.rgba.primary(0.1)}, ${colors.rgba.primary(
+      0.05
+    )})`
   );
-  const borderColor = useColorModeValue("blue.200", "blue.600");
+  const borderColor = useColorModeValue(
+    colors.rgba.primary(0.3),
+    colors.rgba.primary(0.6)
+  );
   const textColor = useColorModeValue("gray.700", "gray.200");
-  const accentColor = useColorModeValue("blue.600", "blue.300");
+  const accentColor = useColorModeValue(colors.primary, colors.light);
 
+  // [Keep all the existing useEffect and handler functions unchanged]
   useEffect(() => {
     checkGameStatus();
   }, []);
@@ -173,7 +184,7 @@ const StageStep = ({
   };
 
   const fetchHint = async () => {
-    if (isLoadingHint) return; // Prevent multiple simultaneous requests
+    if (isLoadingHint) return;
 
     setIsLoadingHint(true);
     try {
@@ -188,7 +199,7 @@ const StageStep = ({
           hint1: hint1 || null,
           hint2: hint2 || null,
         });
-        setSubmitMessage(""); // Clear any previous error messages
+        setSubmitMessage("");
       } else {
         setSubmitMessage(response.data.message || "Hint not available yet.");
       }
@@ -203,7 +214,7 @@ const StageStep = ({
     if (isSubmittingCode || !openCodeInput.trim()) return;
 
     setIsSubmittingCode(true);
-    setSubmitMessage(""); // Clear previous messages
+    setSubmitMessage("");
 
     try {
       const response = await API.post(`/api/team-progress/verify-open-code`, {
@@ -232,7 +243,7 @@ const StageStep = ({
     if (isSubmittingAnswer || !answerInput.trim()) return;
 
     setIsSubmittingAnswer(true);
-    setSubmitMessage(""); // Clear previous messages
+    setSubmitMessage("");
 
     try {
       const response = await API.post(`/api/team-progress/submit-answer`, {
@@ -262,7 +273,6 @@ const StageStep = ({
             stage_id: stage.stageId,
           });
 
-          // Clear state
           setSubmitMessage("");
           setVerified(false);
           setNextStage(null);
@@ -290,16 +300,15 @@ const StageStep = ({
     return (
       <Container maxW="4xl" py={6}>
         <Box
-          bgGradient={gradientBg}
+          bg={gradientBg}
           borderRadius="2xl"
-          boxShadow="2xl"
+          boxShadow={shadows.medium}
           p={8}
-          border="2px solid"
-          borderColor={borderColor}
+          border={borders.primary}
           textAlign="center"
         >
           <VStack spacing={6}>
-            <Spinner size="xl" color="blue.500" thickness="4px" />
+            <Spinner size="xl" color={colors.primary} thickness="4px" />
             <Text fontSize="lg" color={textColor}>
               Loading next stage...
             </Text>
@@ -315,17 +324,28 @@ const StageStep = ({
       <ScaleFade in>
         <Container maxW="4xl" py={8}>
           <Box
-            bgGradient={gradientBg}
+            bg={gradientBg}
             borderRadius="3xl"
-            boxShadow="2xl"
+            boxShadow={shadows.strong}
             p={12}
             textAlign="center"
             position="relative"
             overflow="hidden"
             border="3px solid"
             borderColor="gold"
+            _before={{
+              content: '""',
+              position: "absolute",
+              top: "-3px",
+              left: "-3px",
+              right: "-3px",
+              bottom: "-3px",
+              borderRadius: "3xl",
+              background: gradients.accent,
+              zIndex: -1,
+            }}
           >
-            {/* Decorative elements */}
+            {/* Team-colored decorative elements */}
             <Box
               position="absolute"
               top="-20px"
@@ -333,8 +353,9 @@ const StageStep = ({
               w="40px"
               h="40px"
               borderRadius="full"
-              bg="yellow.400"
+              bg={colors.primary}
               animation={`${sparkle} 2s infinite`}
+              opacity={0.7}
             />
             <Box
               position="absolute"
@@ -343,8 +364,9 @@ const StageStep = ({
               w="30px"
               h="30px"
               borderRadius="full"
-              bg="pink.400"
+              bg={colors.light}
               animation={`${sparkle} 2s infinite 0.5s`}
+              opacity={0.7}
             />
             <Box
               position="absolute"
@@ -353,8 +375,9 @@ const StageStep = ({
               w="35px"
               h="35px"
               borderRadius="full"
-              bg="blue.400"
+              bg={colors.primary}
               animation={`${sparkle} 2s infinite 1s`}
+              opacity={0.7}
             />
 
             <VStack spacing={8}>
@@ -368,9 +391,11 @@ const StageStep = ({
               </Box>
 
               <VStack spacing={4}>
+                <TeamBadge variant="gradient" size="lg" showIcon />
+
                 <Heading
                   size="2xl"
-                  bgGradient="linear(to-r, gold, yellow.400, orange.400)"
+                  bgGradient={`linear(to-r, gold, ${colors.primary}, orange.400)`}
                   bgClip="text"
                   fontWeight="black"
                   textShadow="2px 2px 4px rgba(0,0,0,0.3)"
@@ -394,17 +419,23 @@ const StageStep = ({
                 bg={cardBg}
                 borderRadius="xl"
                 p={6}
-                boxShadow="lg"
-                border="2px solid"
-                borderColor={borderColor}
+                boxShadow={shadows.medium}
+                border={borders.primary}
               >
                 <HStack justify="center" spacing={6}>
                   <VStack>
-                    <Icon as={FaGem} boxSize="30px" color="blue.500" />
+                    <Icon as={FaGem} boxSize="30px" color={colors.primary} />
                     <Text fontSize="lg" fontWeight="bold" color={accentColor}>
                       Stage Completed
                     </Text>
-                    <Badge colorScheme="blue" fontSize="md" px={3} py={1}>
+                    <Badge
+                      bg={colors.primary}
+                      color="white"
+                      fontSize="md"
+                      px={3}
+                      py={1}
+                      borderRadius="full"
+                    >
                       {getStageName(stage.stageNumber)}
                     </Badge>
                   </VStack>
@@ -413,7 +444,11 @@ const StageStep = ({
                     <>
                       <Divider orientation="vertical" h="80px" />
                       <VStack>
-                        <Icon as={TimeIcon} boxSize="30px" color="blue.500" />
+                        <Icon
+                          as={TimeIcon}
+                          boxSize="30px"
+                          color={colors.primary}
+                        />
                         <Text
                           fontSize="lg"
                           fontWeight="bold"
@@ -421,7 +456,14 @@ const StageStep = ({
                         >
                           Total Time
                         </Text>
-                        <Badge colorScheme="blue" fontSize="lg" px={4} py={2}>
+                        <Badge
+                          bg={colors.primary}
+                          color="white"
+                          fontSize="lg"
+                          px={4}
+                          py={2}
+                          borderRadius="full"
+                        >
                           {totalTime}
                         </Badge>
                       </VStack>
@@ -435,7 +477,7 @@ const StageStep = ({
                   <Icon
                     key={i}
                     as={FaStar}
-                    color="gold"
+                    color={colors.primary}
                     boxSize="20px"
                     animation={`${float} 2s infinite ${i * 0.2}s`}
                   />
@@ -756,21 +798,28 @@ const StageStep = ({
         >
           <VStack spacing={6}>
             <Box textAlign="center">
-              <Badge
-                colorScheme="blue"
-                fontSize="md"
-                px={4}
-                py={2}
-                borderRadius="full"
-                mb={2}
+              <HStack justify="center" spacing={3} mb={3}>
+                <TeamBadge teamId={teamId} size="md" />
+                <Badge
+                  colorScheme="blue"
+                  fontSize="md"
+                  px={4}
+                  py={2}
+                  borderRadius="full"
+                >
+                  Stage {stage.stageNumber}
+                </Badge>
+              </HStack>
+              <Heading
+                size="xl"
+                color={accentColor}
+                fontWeight="bold"
+                bgGradient={`linear(to-r, ${teamColor}, blue.500)`}
+                bgClip="text"
               >
-                Stage {stage.stageNumber}
-              </Badge>
-              <Heading size="xl" color={accentColor} fontWeight="bold">
                 {getStageName(stage.stageNumber)}
               </Heading>
             </Box>
-
             {content}
           </VStack>
         </Box>
