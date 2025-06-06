@@ -109,15 +109,15 @@ async function main() {
       // Stage 2 - Trạm Mê Cung
       {
         stage_id: 2,
-        question_text: "Trạm Mê Cung - Answer2.1",
-        answer: "Answer2.1",
+        question_text: "You can’t see it you can only feel it\\Decode this message: ⠇⠁⠃⠽⠗⠊⠝⠞⠓",
+        answer: "Labyrinth",
         hint1: loadImage("2.png"),
         hint2: loadImage("2.png"),
       },
       {
         stage_id: 2,
-        question_text: "Trạm Mê Cung - Answer2.2",
-        answer: "Answer2.2",
+        question_text: "You can’t see it you can only feel it//Decode this message: ⠚⠥⠍⠁⠝⠚⠊",
+        answer: "Jumanji",
         hint1: loadImage("2.png"),
         hint2: loadImage("2.png"),
       },
@@ -125,15 +125,15 @@ async function main() {
       // Stage 3 - Trạm Rắn
       {
         stage_id: 3,
-        question_text: "Trạm Rắn - Answer3.1",
-        answer: "Answer3.1",
+        question_text: "Uncle Seven is moonwalking//Decode this message: ZSFAOLYPU",
+        answer: "Slytherin",
         hint1: loadImage("3.png"),
         hint2: loadImage("3.png"),
       },
       {
         stage_id: 3,
-        question_text: "Trạm Rắn - Answer3.2",
-        answer: "Answer3.2",
+        question_text: "Auntie Five is moonwalking\\Decode this message: XJWUJSY",
+        answer: "Serpent",
         hint1: loadImage("3.png"),
         hint2: loadImage("3.png"),
       },
@@ -141,15 +141,15 @@ async function main() {
       // Stage 4 - Trạm Liên Hoàn
       {
         stage_id: 4,
-        question_text: "Trạm Liên Hoàn - Answer4.1",
-        answer: "Answer4.1",
+        question_text: "I make flow into wolf. What am I?\\Decode this message: YZXPSHZTV",
+        answer: "Backstage",
         hint1: loadImage("4.png"),
         hint2: loadImage("4.png"),
       },
       {
         stage_id: 4,
-        question_text: "Trạm Liên Hoàn - Answer4.2",
-        answer: "Answer4.2",
+        question_text: "I make flow into wolf. What am I?//Decode this message: NFHRXSHZTV",
+        answer: "Musicstage",
         hint1: loadImage("4.png"),
         hint2: loadImage("4.png"),
       },
@@ -157,15 +157,15 @@ async function main() {
       // Stage 5 - Trạm Vòng Xoay
       {
         stage_id: 5,
-        question_text: "Trạm Vòng Xoay - Answer5.1",
-        answer: "Answer5.1",
+        question_text: "Every number tell a story\\Decode this message: 060518180919 2308050512",
+        answer: "Ferris Wheel",
         hint1: loadImage("5.png"),
         hint2: loadImage("5.png"),
       },
       {
         stage_id: 5,
-        question_text: "Trạm Vòng Xoay - Answer5.2",
-        answer: "Answer5.2",
+        question_text: "Every number tell a story//Decode this message: 0318012625 23012205",
+        answer: "Crazy Wave",
         hint1: loadImage("5.png"),
         hint2: loadImage("5.png"),
       },
@@ -173,15 +173,15 @@ async function main() {
       // Stage 6 - Trạm Cá Sấu
       {
         stage_id: 6,
-        question_text: "Trạm Cá Sấu - Answer6.1",
-        answer: "Answer6.1",
+        question_text: "Computer can crack ezpz\\Decode this message: 1-C-C-9-7-1-14-F-12",
+        answer: "Alligator",
         hint1: loadImage("6.png"),
         hint2: loadImage("6.png"),
       },
       {
         stage_id: 6,
-        question_text: "Trạm Cá Sấu - Answer6.2",
-        answer: "Answer6.2",
+        question_text: "	Computer can crack ezpz//Decode this message: 3-12-F-3-F-4-9-C-5",
+        answer: "Crocodile",
         hint1: loadImage("6.png"),
         hint2: loadImage("6.png"),
       },
@@ -189,15 +189,15 @@ async function main() {
       // Stage 7 - Trạm Hồ
       {
         stage_id: 7,
-        question_text: "Trạm Hồ - Answer7.1",
-        answer: "Answer7.1",
+        question_text: "Dive into WATER: R,D,L !!!!",
+        answer: "WATERLILY",
         hint1: loadImage("7.png"),
         hint2: loadImage("7.png"),
       },
       {
         stage_id: 7,
-        question_text: "Trạm Hồ - Answer7.2",
-        answer: "Answer7.2",
+        question_text: "attentioN: R,D,R,D,L,D,U !!!",
+        answer: "NYMPHAEA",
         hint1: loadImage("7.png"),
         hint2: loadImage("7.png"),
       },
@@ -205,7 +205,7 @@ async function main() {
       // Stage 8 - Finish Line
       {
         stage_id: 8,
-        question_text: "Finish Line - STMOVEMENT2025",
+        question_text: "Finish Line",
         answer: "STMOVEMENT2025",
         hint1: loadImage("1.png"),
         hint2: loadImage("1.png"),
