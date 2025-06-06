@@ -1,13 +1,13 @@
 export function getStageName(stageNumber) {
   // Ensure stageNumber is a valid number
   const stage = parseInt(stageNumber);
-  
+
   // Handle invalid or missing stage numbers
   if (!stage || isNaN(stage) || stage < 1) {
     console.warn(`Invalid stage number received: ${stageNumber}`);
     return "Unknown Stage - Contact admin";
   }
-  
+
   switch (stage) {
     case 1:
       return "Warm-Up";
@@ -29,5 +29,37 @@ export function getStageName(stageNumber) {
     default:
       console.warn(`Unknown stage number: ${stage}`);
       return "Unknown Stage - Contact admin";
+  }
+}
+
+function getStageColor(teamId) {
+  // Ensure stageNumber is a valid number
+  const team = parseInt(teamId);
+
+  // Handle invalid or missing stage numbers
+  if (!team || isNaN(team) || team < 1) {
+    console.warn(`Invalid team id received: ${teamId}`);
+    return "Unknown Team - Contact admin";
+  }
+  switch (team) {
+    case 1: // Alpha - Đỏ
+      return "#e30615";
+    case 2: // Beta - Cam
+      return "#9943b0";
+    case 3: // Alpha - Vàng
+      return "#fad02c";
+    case 4: // Beta - Xanh lá
+      return "#0b7442";
+    case 5: // Alpha - Xanh dương nhạt
+      return "#03a2d9";
+    case 6: // Beta - Xanh dương đậm
+      return "#004aad";
+    case 7: // Alpha - Hồng
+      return "#e61193";
+    case 8: // Beta - Tím
+      return "#800080";
+    default:
+      console.warn(`Unknown Team: ${team}`);
+      return "#000000"; // Unknown - Đen
   }
 }

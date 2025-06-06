@@ -420,12 +420,32 @@ async function main() {
   });
 }
 
+async function deleteImages() {
+  const imagesDir = path.join(__dirname, "images");
+
+  try {
+    const files = fs.readdirSync(imagesDir);
+    for (const file of files) {
+      fs.unlinkSync(path.join(imagesDir, file));
+    }
+    console.log("✅ All image files deleted.");
+  } catch (err) {
+    console.error("❌ Failed to delete image files:", err);
+  }
+}
+
+async function main() {
+  // Your full seed logic here...
+}
+
 main()
-  .then(() => {
+  .then(async () => {
     console.log("Seeding completed");
-    return prisma.$disconnect();
+    await prisma.$disconnect();
+    await deleteImages(); // Delete images after seeding
   })
-  .catch((e) => {
+  .catch(async (e) => {
     console.error(e);
-    return prisma.$disconnect();
+    await prisma.$disconnect();
+    process.exit(1);
   });

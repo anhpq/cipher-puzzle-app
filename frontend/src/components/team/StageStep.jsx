@@ -1,4 +1,4 @@
-// Solution 1: Add a transitioning state to prevent flickering
+// Fixed version with proper button state management
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -80,9 +80,12 @@ const StageStep = ({
     hint2: false,
   });
   const [totalTime, setTotalTime] = useState(null);
-  
-  // Add transitioning state to prevent flickering
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Add loading states for each button to prevent disabled state
+  const [isSubmittingCode, setIsSubmittingCode] = useState(false);
+  const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
+  const [isLoadingHint, setIsLoadingHint] = useState(false);
 
   // Enhanced color scheme
   const cardBg = useColorModeValue("white", "gray.800");
@@ -94,7 +97,6 @@ const StageStep = ({
   const textColor = useColorModeValue("gray.700", "gray.200");
   const accentColor = useColorModeValue("blue.600", "blue.300");
 
-  // All your existing useEffect hooks remain the same
   useEffect(() => {
     checkGameStatus();
   }, []);
@@ -171,6 +173,9 @@ const StageStep = ({
   };
 
   const fetchHint = async () => {
+    if (isLoadingHint) return; // Prevent multiple simultaneous requests
+
+    setIsLoadingHint(true);
     try {
       const response = await API.get(`/api/team-progress/get-hint`);
       if (response.data.success) {
@@ -183,15 +188,23 @@ const StageStep = ({
           hint1: hint1 || null,
           hint2: hint2 || null,
         });
+        setSubmitMessage(""); // Clear any previous error messages
       } else {
         setSubmitMessage(response.data.message || "Hint not available yet.");
       }
     } catch (err) {
       setSubmitMessage("Error fetching hint.");
+    } finally {
+      setIsLoadingHint(false);
     }
   };
 
   const handleVerifyOpenCode = async () => {
+    if (isSubmittingCode || !openCodeInput.trim()) return;
+
+    setIsSubmittingCode(true);
+    setSubmitMessage(""); // Clear previous messages
+
     try {
       const response = await API.post(`/api/team-progress/verify-open-code`, {
         stage_id: stage.stageId,
@@ -210,18 +223,24 @@ const StageStep = ({
       setSubmitMessage(
         error.response?.data?.message || "Invalid open code. Please try again."
       );
+    } finally {
+      setIsSubmittingCode(false);
     }
   };
 
-  // Modified handleSubmitAnswer with transition state
   const handleSubmitAnswer = async () => {
+    if (isSubmittingAnswer || !answerInput.trim()) return;
+
+    setIsSubmittingAnswer(true);
+    setSubmitMessage(""); // Clear previous messages
+
     try {
       const response = await API.post(`/api/team-progress/submit-answer`, {
         answer: answerInput,
       });
       if (response.data.success) {
         setSubmitMessage("Correct answer!");
-        
+
         if (nextStage && nextStage.isFinal) {
           setSubmitMessage(
             "Awesome job! You've completed all stages. Please head back to the starting area."
@@ -237,26 +256,23 @@ const StageStep = ({
             .catch(() => setTotalTime(null));
           setGameFinished(true);
         } else {
-          // Start transitioning before making state changes
           setIsTransitioning(true);
-          
+
           await API.put(`/api/team-progress/advance-stage`, {
             stage_id: stage.stageId,
           });
-          
-          // Clear state first
+
+          // Clear state
           setSubmitMessage("");
           setVerified(false);
           setNextStage(null);
           setOpenCodeInput("");
           setAnswerInput("");
-          
-          // Call onAdvance and wait for it to complete
+
           if (typeof onAdvance === "function") {
             await onAdvance();
           }
-          
-          // Small delay to ensure parent component updates
+
           setTimeout(() => {
             setIsTransitioning(false);
           }, 100);
@@ -264,6 +280,8 @@ const StageStep = ({
       }
     } catch (error) {
       setSubmitMessage(error.response?.data?.message || "Wrong answer.");
+    } finally {
+      setIsSubmittingAnswer(false);
     }
   };
 
@@ -367,8 +385,8 @@ const StageStep = ({
                   maxW="600px"
                   lineHeight="tall"
                 >
-                  Outstanding! You've conquered every challenge, solved every
-                  puzzle, and emerged as true champions of this adventure!
+                  You've conquered every challenge and unlocked every secret...
+                  Now, return to the place where your journey first began.
                 </Text>
               </VStack>
 
@@ -391,7 +409,7 @@ const StageStep = ({
                     </Badge>
                   </VStack>
 
-                  {totalTime && (
+                  {false && totalTime && (
                     <>
                       <Divider orientation="vertical" h="80px" />
                       <VStack>
@@ -435,64 +453,6 @@ const StageStep = ({
   if (!verified) {
     content = (
       <VStack spacing={6}>
-        <Box
-          bg={cardBg}
-          borderRadius="xl"
-          p={6}
-          boxShadow="lg"
-          border="2px solid"
-          borderColor={borderColor}
-          w="100%"
-        >
-          <VStack spacing={4}>
-            <HStack spacing={3}>
-              <Icon as={FaLock} color="red.500" boxSize="24px" />
-
-              <Text fontSize="lg" fontWeight="semibold" color={textColor}>
-                Enter Access Code
-              </Text>
-            </HStack>
-
-            <Input
-              placeholder="Enter open code to unlock this stage"
-              value={openCodeInput}
-              onChange={(e) => setOpenCodeInput(e.target.value)}
-              size="lg"
-              variant="filled"
-              bg={useColorModeValue("gray.50", "gray.700")}
-              borderRadius="lg"
-              _focus={{
-                bg: useColorModeValue("white", "gray.600"),
-                borderColor: "blue.400",
-                boxShadow: "0 0 0 1px #9F7AEA",
-              }}
-            />
-
-            <Button
-              onClick={handleVerifyOpenCode}
-              colorScheme="blue"
-              size="lg"
-              borderRadius="lg"
-              leftIcon={<FaUnlock />}
-              _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
-              transition="all 0.2s"
-            >
-              Unlock Stage
-            </Button>
-          </VStack>
-        </Box>
-
-        {submitMessage && (
-          <Alert
-            status={submitMessage.includes("verified") ? "success" : "error"}
-            borderRadius="lg"
-            boxShadow="md"
-          >
-            <AlertIcon />
-            <Text fontWeight="medium">{submitMessage}</Text>
-          </Alert>
-        )}
-
         {!isStageOne && stage.location_image && (
           <Box
             bg={cardBg}
@@ -526,6 +486,74 @@ const StageStep = ({
               </Box>
             </VStack>
           </Box>
+        )}
+        <Box
+          bg={cardBg}
+          borderRadius="xl"
+          p={6}
+          boxShadow="lg"
+          border="2px solid"
+          borderColor={borderColor}
+          w="100%"
+        >
+          <VStack spacing={4}>
+            <HStack spacing={3}>
+              <Icon as={FaLock} color="red.500" boxSize="24px" />
+              <Text fontSize="lg" fontWeight="semibold" color={textColor}>
+                Enter Completion Code
+              </Text>
+            </HStack>
+            <HStack spacing={1}>
+              <Text fontSize="xs" fontWeight="semibold" color={textColor}>
+                Complete all the games in this stage,
+                <br />
+                then ask the Station Chief for the code.
+              </Text>
+            </HStack>
+
+            <Input
+              placeholder="Enter the code to complete this stage"
+              value={openCodeInput}
+              onChange={(e) => setOpenCodeInput(e.target.value)}
+              size="lg"
+              variant="filled"
+              bg={useColorModeValue("gray.50", "gray.700")}
+              borderRadius="lg"
+              disabled={isSubmittingCode}
+              _focus={{
+                bg: useColorModeValue("white", "gray.600"),
+                borderColor: "blue.400",
+                boxShadow: "0 0 0 1px #9F7AEA",
+              }}
+            />
+
+            <Button
+              onClick={handleVerifyOpenCode}
+              colorScheme="blue"
+              size="lg"
+              borderRadius="lg"
+              leftIcon={<FaUnlock />}
+              isLoading={isSubmittingCode}
+              loadingText="Verifying..."
+              isDisabled={!openCodeInput.trim()}
+              _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
+              _disabled={{ transform: "none", boxShadow: "none" }}
+              transition="all 0.2s"
+            >
+              Unlock Next Stage
+            </Button>
+          </VStack>
+        </Box>
+
+        {submitMessage && (
+          <Alert
+            status={submitMessage.includes("verified") ? "success" : "error"}
+            borderRadius="lg"
+            boxShadow="md"
+          >
+            <AlertIcon />
+            <Text fontWeight="medium">{submitMessage}</Text>
+          </Alert>
         )}
       </VStack>
     );
@@ -571,6 +599,7 @@ const StageStep = ({
               variant="filled"
               bg={useColorModeValue("gray.50", "gray.700")}
               borderRadius="lg"
+              disabled={isSubmittingAnswer}
               _focus={{
                 bg: useColorModeValue("white", "gray.600"),
                 borderColor: "green.400",
@@ -584,7 +613,11 @@ const StageStep = ({
               size="lg"
               borderRadius="lg"
               leftIcon={<CheckCircleIcon />}
+              isLoading={isSubmittingAnswer}
+              loadingText="Submitting..."
+              isDisabled={!answerInput.trim()}
               _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
+              _disabled={{ transform: "none", boxShadow: "none" }}
               transition="all 0.2s"
             >
               Submit Answer
@@ -597,9 +630,11 @@ const StageStep = ({
             onClick={fetchHint}
             colorScheme="orange"
             isDisabled={!hintEnabled.hint1}
+            isLoading={isLoadingHint}
             size="md"
             borderRadius="lg"
             _hover={{ transform: "translateY(-2px)" }}
+            _disabled={{ transform: "none" }}
             transition="all 0.2s"
           >
             💡 Hint 1 {hintTimers.hint1 > 0 ? `(${hintTimers.hint1}s)` : ""}
@@ -608,9 +643,11 @@ const StageStep = ({
             onClick={fetchHint}
             colorScheme="orange"
             isDisabled={!hintEnabled.hint2}
+            isLoading={isLoadingHint}
             size="md"
             borderRadius="lg"
             _hover={{ transform: "translateY(-2px)" }}
+            _disabled={{ transform: "none" }}
             transition="all 0.2s"
           >
             🔍 Hint 2 {hintTimers.hint2 > 0 ? `(${hintTimers.hint2}s)` : ""}
@@ -675,7 +712,12 @@ const StageStep = ({
 
         {submitMessage && (
           <Alert
-            status={submitMessage.includes("Correct") || submitMessage.includes("verified") ? "success" : "error"}
+            status={
+              submitMessage.includes("Correct") ||
+              submitMessage.includes("verified")
+                ? "success"
+                : "error"
+            }
             borderRadius="lg"
             boxShadow="md"
           >
