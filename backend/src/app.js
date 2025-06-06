@@ -39,21 +39,26 @@ app.use(
     store: new PgSession({
       pool: pgPool,
       tableName: "session",
+      createTableIfMissing: true, // Tự động tạo bảng session nếu chưa có
     }),
     name: "connect.sid",
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    rolling: false, // Không tạo session ID mới mỗi request
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 2 * 24 * 60 * 60 * 1000,
+      maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
     },
   })
 );
 
+// Debug middleware để track session
 app.use((req, res, next) => {
+  console.log("Session ID:", req.sessionID);
+  console.log("Session data:", req.session);
   next();
 });
 

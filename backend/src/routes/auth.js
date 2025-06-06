@@ -1,48 +1,80 @@
-// server/routes/auth.js
+// server/routes/auth.js - Fixed version
 
-require("dotenv").config(); // Load các biến môi trường từ file .env
+require("dotenv").config();
 const express = require("express");
 const router = express.Router();
-const pool = require("../db"); // Kết nối đến PostgreSQL
+const pool = require("../db");
 
 // POST /api/login
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
-  // Kiểm tra dữ liệu đầu vào
   if (!username || !password) {
     return res
       .status(400)
       .json({ error: "Username and password are required." });
   }
 
-  // Nếu đăng nhập của admin
+  // Admin login
   if (username.toLowerCase() === "admin") {
     if (password === process.env.ADMIN_PASSWORD) {
-      req.session.admin = true;
-      return res.json({ message: "Admin login successful.", role: "admin" });
+      // Regenerate session để tạo session ID mới
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error("Session regeneration error:", err);
+          return res.status(500).json({ error: "Session error." });
+        }
+
+        req.session.admin = true;
+        req.session.save((err) => {
+          if (err) {
+            console.error("Session save error:", err);
+            return res.status(500).json({ error: "Session save error." });
+          }
+          return res.json({
+            message: "Admin login successful.",
+            role: "admin",
+          });
+        });
+      });
     } else {
       return res.status(401).json({ error: "Invalid admin credentials." });
     }
+    return; // Important: prevent further execution
   }
 
-  // Xử lý đăng nhập của team
+  // Team login
   try {
-    // Truy vấn bảng teams theo team_name
     const result = await pool.query(
       "SELECT * FROM teams WHERE team_name = $1",
       [username]
     );
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Team not found." });
     }
+
     const team = result.rows[0];
 
-    // Giả sử ở đây password đang lưu plain text (chỉ để phát triển)
     if (password === team.password) {
-      req.session.team = true;
-      req.session.teamId = team.team_id;
-      return res.json({ message: "Team login successful.", role: "team" });
+      // Regenerate session cho team login
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error("Session regeneration error:", err);
+          return res.status(500).json({ error: "Session error." });
+        }
+
+        req.session.team = true;
+        req.session.teamId = team.team_id;
+
+        req.session.save((err) => {
+          if (err) {
+            console.error("Session save error:", err);
+            return res.status(500).json({ error: "Session save error." });
+          }
+          return res.json({ message: "Team login successful.", role: "team" });
+        });
+      });
     } else {
       return res.status(401).json({ error: "Invalid team credentials." });
     }
@@ -52,19 +84,19 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// POST /api/logout – Logout route, destroys the session
+// POST /api/logout
 router.post("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ error: "Logout failed." });
     }
-    // Optionally clear the cookie (default name is "connect.sid")
     res.clearCookie("connect.sid");
     return res.json({ message: "Logged out successfully." });
   });
 });
 
+// GET /api/verify
 router.get("/verify", (req, res) => {
   if (req.session && req.session.admin) {
     return res.json({ isAuthenticated: true, role: "admin" });

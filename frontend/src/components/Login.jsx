@@ -1,4 +1,5 @@
-// frontend/src/components/Login.jsx
+// frontend/src/components/Login.jsx - Fixed version
+
 import React, { useState, useContext } from "react";
 import {
   Box,
@@ -18,6 +19,7 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { auth, refreshAuth } = useContext(AuthContext);
 
@@ -32,21 +34,25 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
     try {
       const response = await API.post(`/api/login`, { username, password });
 
-      // Chờ cookie được lưu rồi mới refresh auth
-      setTimeout(async () => {
-        await refreshAuth();
+      // Không cần timeout, refresh auth ngay sau khi login thành công
+      await refreshAuth();
 
-        if (response.data.role === "admin") {
-          navigate("/admin/dashboard");
-        } else {
-          navigate("/team");
-        }
-      }, 100);
+      // Navigate dựa trên role từ response
+      if (response.data.role === "admin") {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate("/team", { replace: true });
+      }
     } catch (err) {
       setError(err.response?.data?.error || "Login error.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -63,6 +69,7 @@ function Login() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter your username"
+            disabled={isLoading}
           />
         </FormControl>
         <FormControl mb="4">
@@ -72,6 +79,7 @@ function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
+            disabled={isLoading}
           />
         </FormControl>
         {error && (
@@ -84,7 +92,9 @@ function Login() {
           type="submit"
           colorScheme="blue"
           width="full"
-          isDisabled={!username || !password}
+          isDisabled={!username || !password || isLoading}
+          isLoading={isLoading}
+          loadingText="Logging in..."
         >
           Login
         </Button>
