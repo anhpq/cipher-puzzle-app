@@ -35,16 +35,22 @@ const HintSystem = ({
           isLoading={isLoadingHint}
           size="md"
           borderRadius="lg"
+          fontWeight="semibold"
           _hover={{
             bg: colors.rgba.primary(0.2),
             transform: "translateY(-2px)",
             boxShadow: shadows.soft,
+            color: colors.dark,
           }}
           _disabled={{
             transform: "none",
             opacity: 0.5,
+            color: colors.rgba.primary(0.4),
+            borderColor: colors.rgba.primary(0.3),
           }}
           transition="all 0.2s"
+          px={6}
+          py={3}
         >
           💡 Hint 1 {hintTimers.hint1 > 0 ? `(${hintTimers.hint1}s)` : ""}
         </Button>
@@ -59,16 +65,22 @@ const HintSystem = ({
           isLoading={isLoadingHint}
           size="md"
           borderRadius="lg"
+          fontWeight="semibold"
           _hover={{
             bg: colors.rgba.primary(0.2),
             transform: "translateY(-2px)",
             boxShadow: shadows.soft,
+            color: colors.dark,
           }}
           _disabled={{
             transform: "none",
             opacity: 0.5,
+            color: colors.rgba.primary(0.4),
+            borderColor: colors.rgba.primary(0.3),
           }}
           transition="all 0.2s"
+          px={6}
+          py={3}
         >
           🔍 Hint 2 {hintTimers.hint2 > 0 ? `(${hintTimers.hint2}s)` : ""}
         </Button>

@@ -37,29 +37,20 @@ const TeamDashboard = () => {
   }
 
   return (
-    <Container maxW="container.lg" centerContent py={8}>
+    <Container maxW="container.lg" centerContent p={0}>
       {error ? (
         <Alert status="error" mb={4}>
           <AlertIcon />
           {error}
         </Alert>
       ) : (
-        <>
-          <Heading as="h1" size="2xl" mb={2} color="teal.600">
-            Welcome {teamInfo.team_name}!
-          </Heading>
-          {teamInfo.start_time && (
-            <Text mb={6} fontSize="lg" color="gray.600">
-              Game started at: {new Date(teamInfo.start_time).toLocaleString()}
-            </Text>
-          )}
-          <TeamThemeProvider teamId={teamInfo.team_id}>
-            <TeamDashboardWizard
-              teamId={teamInfo.team_id}
-              onAdvance={fetchTeamInfo}
-            />
-          </TeamThemeProvider>
-        </>
+        <TeamThemeProvider teamId={teamInfo.team_id}>
+          <TeamDashboardWizard
+            teamId={teamInfo.team_id}
+            onAdvance={fetchTeamInfo}
+            startTime={teamInfo.start_time}
+          />
+        </TeamThemeProvider>
       )}
     </Container>
   );

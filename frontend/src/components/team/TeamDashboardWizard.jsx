@@ -21,6 +21,7 @@ import {
   Alert,
   AlertIcon,
   ScaleFade,
+  Heading,
 } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 import { CheckIcon, TimeIcon } from "@chakra-ui/icons";
@@ -38,6 +39,7 @@ import StageStep from "./StageStep";
 import API from "../../api";
 import { getStageName, isValidStageNumber } from "../../utils/helpers";
 import { useTeamTheme } from "../../utils/TeamThemeContext";
+import { color } from "framer-motion";
 
 // Enhanced Animation keyframes
 const pulse = keyframes`
@@ -70,7 +72,7 @@ const sparkle = keyframes`
   50% { opacity: 0.5; transform: scale(1.2); }
 `;
 
-const TeamDashboardWizard = ({ teamId, onAdvance }) => {
+const TeamDashboardWizard = ({ teamId, onAdvance, startTime }) => {
   // Team theme integration
   const { colors, gradients, shadows, borders, teamName } = useTeamTheme();
 
@@ -90,10 +92,6 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
     "white",
     colors.rgba.primary(0.05)
   );
-  const progressBg = useColorModeValue(
-    colors.rgba.primary(0.1),
-    colors.rgba.primary(0.2)
-  );
   const textColor = useColorModeValue("gray.700", "gray.200");
   const accentColor = useColorModeValue(colors.primary, colors.light);
 
@@ -102,21 +100,12 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
     return stages.filter((s) => isValidStageNumber(s.stageNumber) && s.stageNumber !== 8);
   }, [stages]);
 
-  // Progress calculation
-  const progressStats = useMemo(() => {
-    const completed = validStages.filter((s) => s.completed).length;
-    const total = validStages.length;
-    const percentage = total > 0 ? (completed / total) * 100 : 0;
-
-    return { completed, total, percentage };
-  }, [validStages]);
-
   // Visible stages for stepper optimization
   const visibleStages = useMemo(() => {
     if (validStages.length === 0) return [];
 
     if (activeStep === 0) {
-      return validStages.length >= 3 ? validStages.slice(0, 3) : validStages;
+      return validStages.length >= 2 ? validStages.slice(0, 2) : validStages;
     }
 
     const startIndex = Math.max(activeStep - 1, 0);
@@ -321,15 +310,23 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
   };
 
   return (
-    <Box bg={bg} minH="100vh">
-      <Container maxW="6xl" py={4}>
-        <VStack spacing={6}>
+    <Box bg={bg} minH="100vh" w="100%" py={8}>
+      <Heading as="h1" size="2xl" mb={2} color={colors.primary} textAlign="center">
+        Welcome {teamName}!
+      </Heading>
+      {startTime && (
+        <Text mb={1} fontSize="xs" color="gray.600" textAlign="center">
+          Game started at: {new Date(startTime).toLocaleString()}
+        </Text>
+      )}
+      <Container maxW="6xl" py={2} px={2}>
+        <VStack spacing={2}>
           {/* Enhanced Stepper Section */}
           <Box
             bg={stepperBg}
             borderRadius="2xl"
             boxShadow={shadows.medium}
-            p={6}
+            p={2}
             w="100%"
             border={borders.primary}
             position="relative"
@@ -369,12 +366,13 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
                 <Stepper
                   index={activeStep - (activeStep === 0 ? 0 : activeStep - 1)}
                   size="sm"
-                  gap={6}
+                  gap={0}
                 >
                   {visibleStages.map((stage, idx) => {
                     const originalIndex = activeStep === 0 ? idx : idx + (activeStep - 1);
                     const status = getStageStatus(stage, originalIndex);
-
+                    const boxSize = originalIndex === activeStep ? "40px" : "30px";
+                    const fontSize = originalIndex === activeStep ? "lg" : "xs";
                     return (
                       <Step key={stage.stageId}>
                         <Box placeItems="center">
@@ -383,7 +381,7 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
                             borderColor={status.color}
                             color="white"
                             borderWidth="3px"
-                            boxSize="50px"
+                            boxSize={boxSize}
                             animation={status.animation}
                             _hover={{
                               transform: "scale(1.1)",
@@ -393,13 +391,21 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
                             boxShadow={
                               originalIndex === activeStep ? shadows.glow : "none"
                             }
+                            sx={{
+                              '&[data-status=complete]': {
+                                bg: colors.primary,
+                              },
+                              '&[data-status=active]': {
+                                bg: colors.primary,
+                              },
+                            }}
                           >
-                            <Icon as={status.icon} fontSize="lg" />
+                            <Icon as={status.icon} fontSize={fontSize} />
                           </StepIndicator>
 
                           <VStack spacing={2} mt={4}>
                             <Text
-                              fontSize="md"
+                              fontSize="sm"
                               fontWeight="bold"
                               color={accentColor}
                             >
@@ -412,20 +418,25 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
                             >
                               Stage {stage.stageNumber}
                             </Text>
-                            <Badge
+                            {/* <Badge
                               colorScheme={status.badgeColor}
-                              size="sm"
+                              size="md"
                               borderRadius="full"
                               px={3}
                               py={1}
                             >
                               {status.text}
-                            </Badge>
+                            </Badge> */}
                           </VStack>
                         </Box>
                         <StepSeparator
-                          marginBottom={24}
+                          marginBottom={16}
                           bg={colors.rgba.primary(0.2)}
+                          sx={{
+                            '&[data-status=complete]': {
+                              bg: colors.primary,
+                            }
+                          }}
                         />
                       </Step>
                     );
@@ -436,8 +447,8 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
           </Box>
 
           {/* Stage Content with enhanced transition */}
-          <ScaleFade in={!animating} initialScale={0.9}>
-            <Box w="100%">
+          <Box w="100%">
+            <ScaleFade in={!animating} initialScale={0.9}>
               <StageStep
                 stage={currentStage}
                 teamId={teamId}
@@ -445,8 +456,8 @@ const TeamDashboardWizard = ({ teamId, onAdvance }) => {
                 onAdvance={handleAdvance}
                 initialVerified={currentStage.open_code_verified}
               />
-            </Box>
-          </ScaleFade>
+            </ScaleFade>
+          </Box>
 
           {/* Enhanced Footer Info with team colors */}
           <Box

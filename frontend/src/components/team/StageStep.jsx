@@ -277,50 +277,6 @@ const StageStep = ({
             onSubmit={handleVerifyOpenCode}
             isLoading={isSubmittingCode}
           />
-        </VStack>
-      );
-    }
-
-    if (verified && nextStage) {
-      return (
-        <VStack spacing={6} w="100%">
-          <QuestionDisplay
-            question={nextStage.question}
-            answer={answerInput}
-            onAnswerChange={handleAnswerInputChange}
-            onSubmit={handleSubmitAnswer}
-            isLoading={isSubmittingAnswer}
-          />
-
-          <HintSystem
-            hintData={hintData}
-            hintTimers={hintTimers}
-            hintEnabled={hintEnabled}
-            onFetchHint={fetchHint}
-            isLoadingHint={isLoadingHint}
-          />
-        </VStack>
-      );
-    }
-
-    return <LoadingState message="Loading next stage question..." />;
-  };
-
-  return (
-    <Fade in>
-      <Container maxW="4xl" py={6}>
-        <VStack
-          spacing={8}
-          bg={gradients.secondary}
-          borderRadius="2xl"
-          boxShadow={shadows.strong}
-          p={8}
-          border="2px solid"
-          borderColor={colors.rgba.primary(0.3)}
-        >
-          <StageHeader stage={stage} />
-
-          {renderMainContent()}
 
           {submitMessage && (
             <Alert
@@ -338,6 +294,68 @@ const StageStep = ({
               <Text fontWeight="medium">{submitMessage}</Text>
             </Alert>
           )}
+        </VStack>
+      );
+    }
+
+    if (verified && nextStage) {
+      return (
+        <VStack spacing={6} w="100%">
+          <QuestionDisplay
+            question={nextStage.question}
+            answer={answerInput}
+            onAnswerChange={handleAnswerInputChange}
+            onSubmit={handleSubmitAnswer}
+            isLoading={isSubmittingAnswer}
+          />
+
+          {submitMessage && (
+            <Alert
+              status={
+                submitMessage.includes("verified") ||
+                  submitMessage.includes("Correct")
+                  ? "success"
+                  : "error"
+              }
+              borderRadius="lg"
+              boxShadow="md"
+              w="100%"
+            >
+              <AlertIcon />
+              <Text fontWeight="medium">{submitMessage}</Text>
+            </Alert>
+          )}
+
+          <HintSystem
+            hintData={hintData}
+            hintTimers={hintTimers}
+            hintEnabled={hintEnabled}
+            onFetchHint={fetchHint}
+            isLoadingHint={isLoadingHint}
+          />
+        </VStack>
+      );
+    }
+
+    return <LoadingState message="Loading next stage question..." />;
+  };
+
+  return (
+    <Fade in>
+      <Container maxW="6xl" py={6} px={0} centerContent>
+        <VStack
+          spacing={8}
+          bg={gradients.secondary}
+          borderRadius="2xl"
+          boxShadow={shadows.strong}
+          p={8}
+          border="2px solid"
+          borderColor={colors.rgba.primary(0.3)}
+          w="100%"
+        >
+          <StageHeader stage={stage} />
+
+          {renderMainContent()}
         </VStack>
       </Container>
     </Fade>

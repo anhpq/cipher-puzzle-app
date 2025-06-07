@@ -1,7 +1,7 @@
 // Enhanced helpers.js with better error handling and performance
 export const STAGE_NAMES = {
-  1: "Warm-Up",
-  2: "Acceleration", 
+  1: "Warm Up",
+  2: "Acceleration",
   3: "Sharp Turn",
   4: "Obstacle Run",
   5: "Breakaway",
@@ -12,29 +12,33 @@ export const STAGE_NAMES = {
 
 export const TEAM_COLORS = {
   1: "#e30615", // Alpha - Đỏ
-  2: "#9943b0", // Beta - Tím
+  2: "#f9943b", // Beta - Cam
   3: "#fad02c", // Gamma - Vàng
   4: "#0b7442", // Delta - Xanh lá
   5: "#03a2d9", // Epsilon - Xanh dương nhạt
   6: "#004aad", // Zeta - Xanh dương đậm
-  7: "#e61193", // Eta - Hồng
-  8: "#800080"  // Theta - Tím đậm
+  7: "#e61f93", // Omega - Hồng
+  8: "#800080",  // Sigma - Tím đậm
+  9: "#8f5d46", // Titan - Nâu
+  10: "#000000",  // Nova - Đen
 };
 
 export const TEAM_NAMES = {
   1: 'Alpha',
-  2: 'Beta', 
+  2: 'Beta',
   3: 'Gamma',
   4: 'Delta',
   5: 'Epsilon',
   6: 'Zeta',
-  7: 'Eta',
-  8: 'Theta'
+  7: 'Omega',
+  8: 'Sigma',
+  9: 'Titan',
+  10: 'Nova',
 };
 
 export function getStageName(stageNumber) {
   const stage = parseInt(stageNumber);
-  
+
   if (!Number.isInteger(stage) || stage < 1) {
     console.warn(`Invalid stage number received: ${stageNumber}`);
     return "Unknown Stage - Contact admin";
@@ -48,12 +52,12 @@ export function getStageName(stageNumber) {
 
 export function getTeamColor(teamId) {
   const team = parseInt(teamId);
-  
+
   if (!Number.isInteger(team) || team < 1) {
     console.warn(`Invalid team id received: ${teamId}`);
     return "#000000"; // Default black for unknown teams
   }
-  
+
   return TEAM_COLORS[team] || (() => {
     console.warn(`Unknown Team: ${team}`);
     return "#000000"; // Unknown - Đen
