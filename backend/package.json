@@ -12,7 +12,7 @@
     "db:setup": "npx prisma migrate reset --force && npm run seed"
   },
   "dependencies": {
-    "@prisma/client": "^6.8.2",
+    "@prisma/client": "^6.9.0",
     "bcrypt": "^6.0.0",
     "cipher-puzzle-game": "file:..",
     "connect-pg-simple": "^10.0.0",
@@ -25,6 +25,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.10",
-    "prisma": "^6.8.2"
+    "prisma": "^6.9.0"
   }
 }
