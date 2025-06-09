@@ -12,8 +12,8 @@ export const STAGE_NAMES = {
 
 export const TEAM_COLORS = {
   1: "#e30615", // Alpha - Đỏ
-  2: "#f9943b", // Beta - Cam
-  3: "#fad02c", // Gamma - Vàng
+  2: "#FE6603", // Beta - Cam
+  3: "#FFC100", // Gamma - Vàng
   4: "#0b7442", // Delta - Xanh lá
   5: "#03a2d9", // Epsilon - Xanh dương nhạt
   6: "#004aad", // Zeta - Xanh dương đậm
