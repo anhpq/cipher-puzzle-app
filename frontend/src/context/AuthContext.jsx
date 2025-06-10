@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   const verifyAuth = async () => {
     try {
       const response = await API.get(`/api/verify`);
+      debugger;
       setAuth({
         isAuthenticated: response.data.isAuthenticated,
         role: response.data.role,
@@ -30,7 +31,6 @@ export const AuthProvider = ({ children }) => {
       await verifyAuth();
     };
     checkAuth();
-    verifyAuth();
   }, []);
 
   const refreshAuth = async () => {

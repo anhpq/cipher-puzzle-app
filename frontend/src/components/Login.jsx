@@ -39,10 +39,12 @@ function Login() {
 
     try {
       const response = await API.post(`/api/login`, { username, password });
-      console.log(42, API);
 
       // Không cần timeout, refresh auth ngay sau khi login thành công
       await refreshAuth();
+      // setTimeout(async () => {
+      //   await refreshAuth();
+      // }, 1000);
 
       // Navigate dựa trên role từ response
       if (response.data.role === "admin") {
