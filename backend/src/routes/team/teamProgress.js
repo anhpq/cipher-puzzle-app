@@ -21,7 +21,7 @@ router.post("/verify-open-code", teamAuth, async (req, res) => {
       // Cập nhật team_routes: đánh dấu stage hiện tại đã verify open code và set start_at = NOW()
       const result = await db.query(
         "UPDATE team_routes SET open_code_verified = TRUE, start_at = NOW() WHERE stage_id = $1 AND team_id = $2 RETURNING *",
-        [stage_id, req.session.cookie.teamId]
+        [stage_id, req.session.teamId]
       );
       if (result.rowCount === 0) {
         return res
@@ -42,7 +42,7 @@ router.post("/verify-open-code", teamAuth, async (req, res) => {
 
 // 2. Record start time (cho Stage 1)
 router.put("/start-time", teamAuth, async (req, res) => {
-  const team_id = req.session.cookie.teamId;
+  const team_id = req.session.teamId;
   try {
     const result = await db.query(
       "UPDATE teams SET start_time = NOW() WHERE team_id = $1 RETURNING *",
@@ -61,7 +61,7 @@ router.put("/start-time", teamAuth, async (req, res) => {
 // 3. Advance stage (không thay đổi)
 router.put("/advance-stage", teamAuth, async (req, res) => {
   const { stage_id } = req.body;
-  const team_id = req.session.cookie.teamId;
+  const team_id = req.session.teamId;
   try {
     const updateResult = await db.query(
       "UPDATE team_routes SET completed = true, completed_at = NOW() WHERE team_id = $1 AND stage_id = $2 RETURNING *",
@@ -98,7 +98,7 @@ router.put("/advance-stage", teamAuth, async (req, res) => {
 // 4. Refresh stage (reset attempts) – không thay đổi
 router.put("/refresh-stage", teamAuth, async (req, res) => {
   const { stage_id } = req.body;
-  const team_id = req.session.cookie.teamId;
+  const team_id = req.session.teamId;
   try {
     await db.query(
       "UPDATE team_question_assignments SET attempts = 0 WHERE team_id = $1 AND stage_id = $2",
@@ -115,7 +115,7 @@ router.put("/refresh-stage", teamAuth, async (req, res) => {
 //    Khi team submit câu trả lời, đáp án sẽ được so sánh với câu hỏi của stage tiếp theo (stage N+1)
 router.post("/submit-answer", teamAuth, async (req, res) => {
   const { answer } = req.body;
-  const team_id = req.session.cookie.teamId;
+  const team_id = req.session.teamId;
   try {
     // Lấy team_routes của stage hiện tại (đã verify open code, chưa hoàn thành)
     const currentRouteRes = await db.query(
@@ -238,7 +238,7 @@ router.post("/submit-answer", teamAuth, async (req, res) => {
 // 6. Get hint endpoint cho stage N+1:
 //    Trả về thông tin hint cho câu hỏi của stage tiếp theo (bao gồm elapsedSeconds, hint1 và hint2)
 router.get("/get-hint", teamAuth, async (req, res) => {
-  const teamId = req.session.cookie.teamId;
+  const teamId = req.session.teamId;
   try {
     // Lấy team_routes của stage hiện tại (đã verify open code)
     const currentRes = await db.query(
@@ -296,7 +296,7 @@ router.get("/get-hint", teamAuth, async (req, res) => {
 
 // 7. Get current stages endpoint – hiển thị các stage hiện tại của team (dùng cho giao diện)
 router.get("/current-stages", teamAuth, async (req, res) => {
-  const teamId = req.session.cookie.teamId;
+  const teamId = req.session.teamId;
   if (!teamId) {
     return res.status(401).json({ error: "You are not authenticated" });
   }
@@ -337,7 +337,7 @@ router.get("/current-stages", teamAuth, async (req, res) => {
 
 // 8. Next-stage endpoint: Return information for the next stage’s question (stage N+1)
 router.get("/next-stage", teamAuth, async (req, res) => {
-  const teamId = req.session.cookie.teamId;
+  const teamId = req.session.teamId;
   try {
     // Get current stage (verified and not completed)
     const currentRes = await db.query(
@@ -408,7 +408,7 @@ router.get("/next-stage", teamAuth, async (req, res) => {
 // 9. Total time endpoint (không thay đổi)
 router.get("/total-time", teamAuth, async (req, res) => {
   try {
-    const teamId = req.session.cookie.teamId;
+    const teamId = req.session.teamId;
     if (!teamId)
       return res.status(401).json({ error: "Not authenticated as team." });
     const query = `
