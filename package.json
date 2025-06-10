@@ -12,7 +12,6 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "bcrypt": "^6.0.0",
-    "concurrently": "^8.2.0",
-    "jsonwebtoken": "^9.0.2"
+    "concurrently": "^8.2.0"
   }
 }
