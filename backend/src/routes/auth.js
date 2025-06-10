@@ -19,7 +19,7 @@ router.post("/login", async (req, res) => {
   if (username.toLowerCase() === "admin") {
     if (password === process.env.ADMIN_PASSWORD) {
       // Regenerate session để tạo session ID mới
-      req.session.regenerate((err) => {
+      await req.session.regenerate((err) => {
         if (err) {
           console.error("Session regeneration error:", err);
           return res.status(500).json({ error: "Session error." });
