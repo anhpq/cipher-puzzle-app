@@ -97,7 +97,7 @@ router.post("/logout", (req, res) => {
 });
 
 // GET /api/verify
-router.get("/verify", (req, res) => {
+router.get("/verify", async (req, res) => {
   if (req.session && req.session.admin) {
     return res.json({ isAuthenticated: true, role: "admin" });
   } else if (req.session && req.session.team) {
