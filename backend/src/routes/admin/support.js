@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../db');
-const adminAuth = require('../../middlewares/adminAuth');
+const adminAuth = require('../../middleware/adminAuth');
 
 // GET: Lấy danh sách thông tin hỗ trợ (bạn tự định nghĩa logic dựa theo bảng team_question_assignments hoặc team_routes)
 router.get('/', adminAuth, async (req, res) => {

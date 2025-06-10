@@ -5,7 +5,7 @@ const db = require('../../db'); // Giả sử db.query để tương tác với 
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-const adminAuth = require('../../middlewares/adminAuth');
+const adminAuth = require('../../middleware/adminAuth');
 
 // POST: Thêm mới một stage với upload file location_image
 router.post('/', adminAuth, upload.single('location_image'), async (req, res) => {

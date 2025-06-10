@@ -27,7 +27,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import axios from "axios";
-import API from "../../api";
+import API from "../../config/api";
 
 const TeamRoutesTab = () => {
   // State lưu trữ dữ liệu aggregated trả về từ endpoint GET /aggregate

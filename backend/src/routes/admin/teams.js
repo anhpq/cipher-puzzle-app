@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../db');  // Đảm bảo module db đã được cấu hình kết nối PostgreSQL
-const adminAuth = require('../../middlewares/adminAuth');
+const adminAuth = require('../../middleware/adminAuth');
 
 /**
  * GET /api/admin/teams/status

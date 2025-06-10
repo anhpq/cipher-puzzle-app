@@ -9,7 +9,7 @@
     "prisma:migrate": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
     "seed": "node prisma/seed.js",
-    "db:setup": "npx prisma migrate reset --force && npm run seed"
+    "db:setup": "npx prisma migrate reset && npx prisma migrate reset --force && npm run seed"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

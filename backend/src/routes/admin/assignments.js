@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../db');
-const adminAuth = require('../../middlewares/adminAuth');
+const adminAuth = require('../../middleware/adminAuth');
 
 // GET assignments (đã có)
 router.get('/', adminAuth, async (req, res) => {

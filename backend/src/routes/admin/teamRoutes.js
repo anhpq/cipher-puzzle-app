@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../db'); // Giả sử bạn có db.query để tương tác với PostgreSQL
-const adminAuth = require('../../middlewares/adminAuth');
+const adminAuth = require('../../middleware/adminAuth');
 
 // Endpoint cập nhật aggregated team route với stage name
 router.put('/aggregate/:team_id', adminAuth, async (req, res) => {

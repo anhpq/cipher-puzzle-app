@@ -12,7 +12,7 @@ import {
 import { FaLocationDot } from "react-icons/fa6";
 import { useTeamTheme } from "../../../utils/TeamThemeContext";
 
-const LocationDisplay = ({ locationImage }) => {
+const LocationDisplay = ({ locationImage, description }) => {
   const { colors, shadows, borders } = useTeamTheme();
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue(
@@ -39,7 +39,9 @@ const LocationDisplay = ({ locationImage }) => {
             Find This Location
           </Text>
         </HStack>
-
+        <Text fontSize="xs" color={colors.primary}>
+          {description}
+        </Text>
         <Box
           borderRadius="lg"
           overflow="hidden"

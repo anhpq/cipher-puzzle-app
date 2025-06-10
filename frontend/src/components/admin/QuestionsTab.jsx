@@ -29,8 +29,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import axios from 'axios';
-import API from '../../api';
+import API from "../../config/api";;
 
 const QuestionsTab = () => {
   const [questions, setQuestions] = useState([]);

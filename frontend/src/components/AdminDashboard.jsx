@@ -9,10 +9,9 @@ import {
   TabPanels,
   Tab,
   TabPanel,
-  TabIndicator
+  TabIndicator,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import Api from "../api";
 import AuthContext from "../context/AuthContext";
 
 // Import các component khác
@@ -22,10 +21,11 @@ import TeamRoutesTab from "./admin/TeamRoutesTab";
 import AssignmentsTab from "./admin/AssignmentsTab";
 import TeamStatusSupportTab from "./admin/TeamStatusSupportTab";
 import TeamTimeReportTab from "./admin/TeamTimeReportTab";
+import API from "../config/api";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { auth, refreshAuth } = useContext(AuthContext);
+  const { auth, refreshAuth, logout } = useContext(AuthContext);
 
   // Nếu auth.role không phải admin thì chuyển về trang team dashboard
   if (auth.role !== "admin") {
@@ -34,7 +34,7 @@ const AdminDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await Api.post("/api/logout", {});
+      const result = await logout();
       // Gọi refreshAuth để cập nhật trạng thái (isAuthenticated = false)
       await refreshAuth();
       navigate("/");

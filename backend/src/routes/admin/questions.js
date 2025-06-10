@@ -5,7 +5,7 @@ const db = require('../../db'); // Giả sử db.query được cấu hình truy
 const multer = require('multer');
 const storage = multer.memoryStorage(); // Lưu file vào bộ nhớ
 const upload = multer({ storage: storage });
-const adminAuth = require('../../middlewares/adminAuth');
+const adminAuth = require('../../middleware/adminAuth');
 
 // POST: Thêm mới câu hỏi với file upload cho hint1 và hint2
 router.post('/', adminAuth, upload.fields([{ name: 'hint1' }, { name: 'hint2' }]), async (req, res) => {

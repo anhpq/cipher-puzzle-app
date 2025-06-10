@@ -29,38 +29,29 @@ const shimmer = keyframes`
 
 const StageHeader = ({ stage }) => {
   const { colors, gradients, shadows, borders, teamName } = useTeamTheme();
-  const headerBg = useColorModeValue(
-    colors.rgba.primary(0.05),
-    colors.rgba.primary(0.1)
+  const borderColor = useColorModeValue(
+    colors.rgba.primary(0.3),
+    colors.rgba.primary(0.6)
   );
 
+  const cardBg = useColorModeValue("white", "gray.800");
   return (
-    <Box 
-      textAlign="center" 
+    <Box
+      textAlign="center"
       position="relative"
       py={6}
       px={4}
-      bg={headerBg}
+      bg={cardBg}
       borderRadius="2xl"
       border="2px solid"
-      borderColor={colors.rgba.primary(0.2)}
-      boxShadow={shadows.medium}
+      borderColor={borderColor}
+      boxShadow={shadows.soft}
     >
       {/* Decorative background elements */}
-      <Box
-        position="absolute"
-        top="10px"
-        left="20px"
-        opacity={0.3}
-      >
+      <Box position="absolute" top="10px" left="20px" opacity={0.3}>
         <Icon as={FaRoute} boxSize="24px" color={colors.primary} />
       </Box>
-      <Box
-        position="absolute"
-        top="10px"
-        right="20px"
-        opacity={0.3}
-      >
+      <Box position="absolute" top="10px" right="20px" opacity={0.3}>
         <Icon as={FaFlag} boxSize="24px" color={colors.primary} />
       </Box>
 
@@ -100,7 +91,9 @@ const StageHeader = ({ stage }) => {
               left: 0,
               right: 0,
               bottom: 0,
-              background: `linear-gradient(90deg, transparent, ${colors.rgba.primary(0.3)}, transparent)`,
+              background: `linear-gradient(90deg, transparent, ${colors.rgba.primary(
+                0.3
+              )}, transparent)`,
               backgroundSize: "200% 100%",
               animation: `${shimmer} 2s infinite`,
             }}
@@ -149,9 +142,7 @@ const StageHeader = ({ stage }) => {
                   ? colors.primary
                   : colors.rgba.primary(0.2)
               }
-              boxShadow={
-                i + 1 <= stage.stageNumber ? shadows.soft : "none"
-              }
+              boxShadow={i + 1 <= stage.stageNumber ? shadows.soft : "none"}
               transition="all 0.3s"
               _hover={{
                 transform: i + 1 <= stage.stageNumber ? "scale(1.2)" : "none",

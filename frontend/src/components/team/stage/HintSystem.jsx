@@ -27,7 +27,7 @@ const HintSystem = ({
       <HStack spacing={4} justify="center" flexWrap="wrap">
         <Button
           onClick={onFetchHint}
-          bg={colors.rgba.primary(0.1)}
+          bg={colors.rgba.primary(0)}
           color={colors.primary}
           border="2px solid"
           borderColor={colors.primary}
@@ -57,7 +57,7 @@ const HintSystem = ({
 
         <Button
           onClick={onFetchHint}
-          bg={colors.rgba.primary(0.1)}
+          bg={colors.rgba.primary(0)}
           color={colors.primary}
           border="2px solid"
           borderColor={colors.primary}

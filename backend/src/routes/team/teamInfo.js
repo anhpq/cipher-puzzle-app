@@ -2,10 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../db');
-const teamAuth = require('../../middlewares/teamAuth');
+const teamAuth = require('../../middleware/teamAuth');
 
 router.get('/info', teamAuth, async (req, res) => {
-  const teamId = req.session.teamId;
+  const teamId = req.teamId;
   if (!teamId) {
     return res.status(401).json({ error: 'Not authenticated' });
   }

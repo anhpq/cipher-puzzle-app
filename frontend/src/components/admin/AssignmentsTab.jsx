@@ -27,8 +27,7 @@ import {
   ModalCloseButton,
   useToast,
 } from '@chakra-ui/react';
-import axios from 'axios';
-import API from '../../api';
+import API from "../../config/api";;
 
 const AssignmentsTab = () => {
   const [assignments, setAssignments] = useState([]);

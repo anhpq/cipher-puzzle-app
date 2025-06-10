@@ -7,8 +7,9 @@ import {
   AlertIcon,
   Text,
   Fade,
+  Box,
+  useColorModeValue,
 } from "@chakra-ui/react";
-import API from "../../api";
 
 // Import separate components
 import StageHeader from "./stage/StageHeader";
@@ -19,6 +20,7 @@ import HintSystem from "./stage/HintSystem";
 import VictoryScreen from "./stage/VictoryScreen";
 import LoadingState from "./stage/LoadingState";
 import { useTeamTheme } from "../../utils/TeamThemeContext";
+import API from "../../config/api";
 
 const StageStep = ({
   stage,
@@ -55,6 +57,8 @@ const StageStep = ({
   const [isSubmittingCode, setIsSubmittingCode] = useState(false);
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [isLoadingHint, setIsLoadingHint] = useState(false);
+
+  const cardBg = useColorModeValue("white", "gray.800");
 
   // Effects
   useEffect(() => {
@@ -268,7 +272,10 @@ const StageStep = ({
       return (
         <VStack spacing={6} w="100%">
           {!isStageOne && stage.location_image && (
-            <LocationDisplay locationImage={stage.location_image} />
+            <LocationDisplay
+              locationImage={stage.location_image}
+              description={stage.description}
+            />
           )}
 
           <CodeInput
@@ -282,7 +289,7 @@ const StageStep = ({
             <Alert
               status={
                 submitMessage.includes("verified") ||
-                  submitMessage.includes("Correct")
+                submitMessage.includes("Correct")
                   ? "success"
                   : "error"
               }
@@ -313,7 +320,7 @@ const StageStep = ({
             <Alert
               status={
                 submitMessage.includes("verified") ||
-                  submitMessage.includes("Correct")
+                submitMessage.includes("Correct")
                   ? "success"
                   : "error"
               }
@@ -342,7 +349,7 @@ const StageStep = ({
 
   return (
     <Fade in>
-      <Container maxW="6xl" py={6} px={0} centerContent>
+      <Container maxW="6xl" py={0} px={0} centerContent>
         <VStack
           spacing={8}
           bg={gradients.secondary}
@@ -354,7 +361,6 @@ const StageStep = ({
           w="100%"
         >
           <StageHeader stage={stage} />
-
           {renderMainContent()}
         </VStack>
       </Container>

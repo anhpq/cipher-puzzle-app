@@ -14,8 +14,7 @@ import {
   AlertIcon,
   Text,
 } from '@chakra-ui/react';
-import axios from 'axios';
-import API from '../../api';
+import API from '../../config/api';
 
 // Hàm chuyển đổi số giây sang chuỗi HH:MM:SS
 const formatSeconds = (seconds) => {

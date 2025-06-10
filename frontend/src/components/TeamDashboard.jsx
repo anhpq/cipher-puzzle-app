@@ -9,7 +9,7 @@ import {
   AlertIcon,
 } from "@chakra-ui/react";
 import TeamDashboardWizard from "./team/TeamDashboardWizard";
-import API from "../api";
+import API from "../config/api";
 import { TeamThemeProvider } from "../utils/TeamThemeContext";
 
 const TeamDashboard = () => {

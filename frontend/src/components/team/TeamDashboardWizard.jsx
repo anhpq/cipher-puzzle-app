@@ -36,7 +36,7 @@ import {
   FaGem,
 } from "react-icons/fa6";
 import StageStep from "./StageStep";
-import API from "../../api";
+import API from "../../config/api";
 import { getStageName, isValidStageNumber } from "../../utils/helpers";
 import { useTeamTheme } from "../../utils/TeamThemeContext";
 import { color } from "framer-motion";
@@ -321,131 +321,6 @@ const TeamDashboardWizard = ({ teamId, onAdvance, startTime }) => {
       )}
       <Container maxW="6xl" py={2} px={2}>
         <VStack spacing={2}>
-          {/* Enhanced Stepper Section */}
-          <Box
-            bg={stepperBg}
-            borderRadius="2xl"
-            boxShadow={shadows.medium}
-            p={2}
-            w="100%"
-            border={borders.primary}
-            position="relative"
-            overflow="hidden"
-          >
-            {/* Team-colored decorative elements */}
-            <Box
-              position="absolute"
-              top="-10px"
-              right="-10px"
-              w="20px"
-              h="20px"
-              borderRadius="full"
-              bg={colors.primary}
-              animation={`${sparkle} 3s infinite`}
-              opacity={0.3}
-            />
-
-            <VStack spacing={4}>
-              <HStack justify="center" spacing={3}>
-                <Text>
-                  🎯
-                </Text>
-                <Text
-                  fontSize="xl"
-                  fontWeight="bold"
-                  color={accentColor}
-                  textAlign="center"
-                  bgGradient={`linear(to-r, ${colors.primary}, ${colors.light})`}
-                  bgClip="text"
-                >
-                  Current Stage Path
-                </Text>
-              </HStack>
-
-              <Box w="100%" overflowX="auto" pt={4}>
-                <Stepper
-                  index={activeStep - (activeStep === 0 ? 0 : activeStep - 1)}
-                  size="sm"
-                  gap={0}
-                >
-                  {visibleStages.map((stage, idx) => {
-                    const originalIndex = activeStep === 0 ? idx : idx + (activeStep - 1);
-                    const status = getStageStatus(stage, originalIndex);
-                    const boxSize = originalIndex === activeStep ? "40px" : "30px";
-                    const fontSize = originalIndex === activeStep ? "lg" : "xs";
-                    return (
-                      <Step key={stage.stageId}>
-                        <Box placeItems="center">
-                          <StepIndicator
-                            bg={status.color}
-                            borderColor={status.color}
-                            color="white"
-                            borderWidth="3px"
-                            boxSize={boxSize}
-                            animation={status.animation}
-                            _hover={{
-                              transform: "scale(1.1)",
-                              boxShadow: shadows.glow
-                            }}
-                            transition="all 0.3s"
-                            boxShadow={
-                              originalIndex === activeStep ? shadows.glow : "none"
-                            }
-                            sx={{
-                              '&[data-status=complete]': {
-                                bg: colors.primary,
-                              },
-                              '&[data-status=active]': {
-                                bg: colors.primary,
-                              },
-                            }}
-                          >
-                            <Icon as={status.icon} fontSize={fontSize} />
-                          </StepIndicator>
-
-                          <VStack spacing={2} mt={4}>
-                            <Text
-                              fontSize="sm"
-                              fontWeight="bold"
-                              color={accentColor}
-                            >
-                              {getStageName(stage.stageNumber)}
-                            </Text>
-                            <Text
-                              fontSize="xs"
-                              color={textColor}
-                              opacity={0.8}
-                            >
-                              Stage {stage.stageNumber}
-                            </Text>
-                            {/* <Badge
-                              colorScheme={status.badgeColor}
-                              size="md"
-                              borderRadius="full"
-                              px={3}
-                              py={1}
-                            >
-                              {status.text}
-                            </Badge> */}
-                          </VStack>
-                        </Box>
-                        <StepSeparator
-                          marginBottom={16}
-                          bg={colors.rgba.primary(0.2)}
-                          sx={{
-                            '&[data-status=complete]': {
-                              bg: colors.primary,
-                            }
-                          }}
-                        />
-                      </Step>
-                    );
-                  })}
-                </Stepper>
-              </Box>
-            </VStack>
-          </Box>
-
           {/* Stage Content with enhanced transition */}
           <Box w="100%">
             <ScaleFade in={!animating} initialScale={0.9}>

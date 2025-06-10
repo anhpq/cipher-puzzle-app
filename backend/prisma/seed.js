@@ -38,42 +38,42 @@ async function main() {
       {
         stage_number: 2,
         stage_name: "Trạm Mê Cung",
-        description: "Thành + CTV",
+        description: "Pedro + CTV",
         open_code: "1510",
         location_image: loadImage("2.png"),
       },
       {
         stage_number: 3,
         stage_name: "Trạm Rắn",
-        description: "Tặng + CTV",
+        description: "Tặng + Alice",
         open_code: "2010",
         location_image: loadImage("3.png"),
       },
       {
         stage_number: 4,
         stage_name: "Trạm Liên Hoàn",
-        description: "Tuyền + Thư",
+        description: "Rosie + Esther",
         open_code: "2912",
         location_image: loadImage("4.png"),
       },
       {
         stage_number: 5,
         stage_name: "Trạm Vòng Xoay",
-        description: "Lân + Quốc Anh",
+        description: "Peter + Ant",
         open_code: "7749",
         location_image: loadImage("5.png"),
       },
       {
         stage_number: 6,
         stage_name: "Trạm Cá Sấu",
-        description: "Bryan + CTV",
+        description: "Bryan + Hanah",
         open_code: "6666",
         location_image: loadImage("6.png"),
       },
       {
         stage_number: 7,
         stage_name: "Trạm Hồ",
-        description: "Lâu + CTV",
+        description: "Kaio + Tammy",
         open_code: "2210",
         location_image: loadImage("7.png"),
       },
@@ -420,29 +420,10 @@ async function main() {
   });
 }
 
-async function deleteImages() {
-  const imagesDir = path.join(__dirname, "images");
-
-  try {
-    const files = fs.readdirSync(imagesDir);
-    for (const file of files) {
-      fs.unlinkSync(path.join(imagesDir, file));
-    }
-    console.log("✅ All image files deleted.");
-  } catch (err) {
-    console.error("❌ Failed to delete image files:", err);
-  }
-}
-
-async function main() {
-  // Your full seed logic here...
-}
-
 main()
   .then(async () => {
     console.log("Seeding completed");
     await prisma.$disconnect();
-    await deleteImages(); // Delete images after seeding
   })
   .catch(async (e) => {
     console.error(e);

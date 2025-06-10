@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../db'); // Đảm bảo db đã được cấu hình (ví dụ sử dụng pg Pool)
-const adminAuth = require('../../middlewares/adminAuth');
+const adminAuth = require('../../middleware/adminAuth');
 
 //
 // GET /api/admin/reports/team-time

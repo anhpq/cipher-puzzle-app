@@ -15,8 +15,7 @@ import {
   AlertIcon,
   Text
 } from '@chakra-ui/react';
-import axios from 'axios';
-import API from '../../api';
+import API from "../../config/api";;
 
 const TeamStatusSupportTab = () => {
   const [teams, setTeams] = useState([]);
