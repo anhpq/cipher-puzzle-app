@@ -110,9 +110,7 @@ router.post("/logout", authenticateToken, (req, res) => {
 
 // GET /api/verify
 router.get("/verify", authenticateToken, (req, res) => {
-  console.log(113, req.user);
   const { role, teamId, teamName, username } = req.user;
-  console.log(115, req.user);
   return res.json({
     isAuthenticated: true,
     role,

@@ -80,7 +80,6 @@ export const AuthProvider = ({ children }) => {
       setError(null);
 
       const token = TokenUtils.getToken();
-      console.log(82, token);
       if (!token) {
         setAuth({
           isAuthenticated: false,
