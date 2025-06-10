@@ -5,7 +5,7 @@ const db = require('../../db');
 const teamAuth = require('../../middlewares/teamAuth');
 
 router.get('/info', teamAuth, async (req, res) => {
-  const teamId = req.session.teamId;
+  const teamId = req.session.cookie.teamId;
   if (!teamId) {
     return res.status(401).json({ error: 'Not authenticated' });
   }

@@ -19,14 +19,14 @@ router.post("/login", async (req, res) => {
   if (username.toLowerCase() === "admin") {
     if (password === process.env.ADMIN_PASSWORD) {
       // Regenerate session để tạo session ID mới
-      await req.session.regenerate((err) => {
+      req.session.cookie.regenerate((err) => {
         if (err) {
           console.error("Session regeneration error:", err);
           return res.status(500).json({ error: "Session error." });
         }
 
-        req.session.admin = true;
-        req.session.save((err) => {
+        req.session.cookie.admin = true;
+        req.session.cookie.save((err) => {
           if (err) {
             console.error("Session save error:", err);
             return res.status(500).json({ error: "Session save error." });
@@ -58,16 +58,16 @@ router.post("/login", async (req, res) => {
 
     if (password === team.password) {
       // Regenerate session cho team login
-      req.session.regenerate((err) => {
+      req.session.cookie.regenerate((err) => {
         if (err) {
           console.error("Session regeneration error:", err);
           return res.status(500).json({ error: "Session error." });
         }
 
-        req.session.team = true;
-        req.session.teamId = team.team_id;
+        req.session.cookie.team = true;
+        req.session.cookie.teamId = team.team_id;
 
-        req.session.save((err) => {
+        req.session.cookie.save((err) => {
           if (err) {
             console.error("Session save error:", err);
             return res.status(500).json({ error: "Session save error." });
@@ -86,7 +86,7 @@ router.post("/login", async (req, res) => {
 
 // POST /api/logout
 router.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
+  req.session.cookie.destroy((err) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ error: "Logout failed." });
@@ -98,9 +98,9 @@ router.post("/logout", (req, res) => {
 
 // GET /api/verify
 router.get("/verify", async (req, res) => {
-  if (req.session && req.session.admin) {
+  if (req.session && req.session.cookie.admin) {
     return res.json({ isAuthenticated: true, role: "admin" });
-  } else if (req.session && req.session.team) {
+  } else if (req.session && req.session.cookie.team) {
     return res.json({ isAuthenticated: true, role: "team" });
   }
   return res.json({ isAuthenticated: false });
