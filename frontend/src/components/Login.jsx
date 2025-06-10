@@ -1,4 +1,4 @@
-// frontend/src/components/Login.jsx - Fixed version
+// frontend/src/components/Login.jsx - Fixed version with better session handling
 
 import React, { useState, useContext } from "react";
 import {
@@ -23,7 +23,7 @@ function Login() {
   const navigate = useNavigate();
   const { auth, refreshAuth } = useContext(AuthContext);
 
-  // Nếu đã đăng nhập rồi, chuyển ngay về dashboard tương ứng
+  // If already authenticated, redirect to appropriate dashboard
   if (!auth.loading && auth.isAuthenticated) {
     if (auth.role === "admin") {
       return <Navigate to="/admin/dashboard" replace />;
@@ -39,17 +39,21 @@ function Login() {
 
     try {
       const response = await API.post(`/api/login`, { username, password });
-
-      // Không cần timeout, refresh auth ngay sau khi login thành công
+      
+      // Add a small delay to ensure session is properly saved on server
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Refresh auth state
       await refreshAuth();
-
-      // Navigate dựa trên role từ response
+      
+      // Navigate based on role from response
       if (response.data.role === "admin") {
         navigate("/admin/dashboard", { replace: true });
       } else {
         navigate("/team", { replace: true });
       }
     } catch (err) {
+      console.error("Login error:", err);
       setError(err.response?.data?.error || "Login error.");
     } finally {
       setIsLoading(false);

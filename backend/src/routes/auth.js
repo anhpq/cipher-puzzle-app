@@ -1,4 +1,4 @@
-// server/routes/auth.js - Fixed version
+// server/routes/auth.js - Fixed version with proper session handling
 
 require("dotenv").config();
 const express = require("express");
@@ -18,29 +18,39 @@ router.post("/login", async (req, res) => {
   // Admin login
   if (username.toLowerCase() === "admin") {
     if (password === process.env.ADMIN_PASSWORD) {
-      // Regenerate session để tạo session ID mới
-      await req.session.regenerate((err) => {
-        if (err) {
-          console.error("Session regeneration error:", err);
-          return res.status(500).json({ error: "Session error." });
-        }
-
-        req.session.admin = true;
-        req.session.save((err) => {
-          if (err) {
-            console.error("Session save error:", err);
-            return res.status(500).json({ error: "Session save error." });
-          }
-          return res.json({
-            message: "Admin login successful.",
-            role: "admin",
+      // Use promisified session regeneration
+      try {
+        await new Promise((resolve, reject) => {
+          req.session.regenerate((err) => {
+            if (err) reject(err);
+            else resolve();
           });
         });
-      });
+
+        // Set session data
+        req.session.admin = true;
+        req.session.user_id = 'admin';
+        req.session.role = 'admin';
+
+        // Save session with promise
+        await new Promise((resolve, reject) => {
+          req.session.save((err) => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
+
+        return res.json({
+          message: "Admin login successful.",
+          role: "admin",
+        });
+      } catch (err) {
+        console.error("Session error:", err);
+        return res.status(500).json({ error: "Session error." });
+      }
     } else {
       return res.status(401).json({ error: "Invalid admin credentials." });
     }
-    return; // Important: prevent further execution
   }
 
   // Team login
@@ -57,29 +67,43 @@ router.post("/login", async (req, res) => {
     const team = result.rows[0];
 
     if (password === team.password) {
-      // Regenerate session cho team login
-      req.session.regenerate((err) => {
-        if (err) {
-          console.error("Session regeneration error:", err);
-          return res.status(500).json({ error: "Session error." });
-        }
+      // Use promisified session regeneration for team login
+      try {
+        await new Promise((resolve, reject) => {
+          req.session.regenerate((err) => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
 
+        // Set session data
         req.session.team = true;
         req.session.teamId = team.team_id;
+        req.session.user_id = team.team_id;
+        req.session.role = 'team';
 
-        req.session.save((err) => {
-          if (err) {
-            console.error("Session save error:", err);
-            return res.status(500).json({ error: "Session save error." });
-          }
-          return res.json({ message: "Team login successful.", role: "team" });
+        // Save session with promise
+        await new Promise((resolve, reject) => {
+          req.session.save((err) => {
+            if (err) reject(err);
+            else resolve();
+          });
         });
-      });
+
+        return res.json({ 
+          message: "Team login successful.", 
+          role: "team",
+          teamId: team.team_id 
+        });
+      } catch (err) {
+        console.error("Session error:", err);
+        return res.status(500).json({ error: "Session error." });
+      }
     } else {
       return res.status(401).json({ error: "Invalid team credentials." });
     }
   } catch (err) {
-    console.error(err);
+    console.error("Database error:", err);
     return res.status(500).json({ error: "Server error during team login." });
   }
 });
@@ -88,7 +112,7 @@ router.post("/login", async (req, res) => {
 router.post("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      console.error(err);
+      console.error("Logout error:", err);
       return res.status(500).json({ error: "Logout failed." });
     }
     res.clearCookie("connect.sid");
@@ -98,11 +122,28 @@ router.post("/logout", (req, res) => {
 
 // GET /api/verify
 router.get("/verify", async (req, res) => {
-  if (req.session && req.session.admin) {
-    return res.json({ isAuthenticated: true, role: "admin" });
-  } else if (req.session && req.session.team) {
-    return res.json({ isAuthenticated: true, role: "team" });
+  console.log("Session verification:", {
+    sessionId: req.sessionID,
+    session: req.session,
+    admin: req.session?.admin,
+    team: req.session?.team
+  });
+
+  if (req.session && req.session.admin === true) {
+    return res.json({ 
+      isAuthenticated: true, 
+      role: "admin",
+      userId: req.session.user_id 
+    });
+  } else if (req.session && req.session.team === true) {
+    return res.json({ 
+      isAuthenticated: true, 
+      role: "team",
+      teamId: req.session.teamId,
+      userId: req.session.user_id
+    });
   }
+  
   return res.json({ isAuthenticated: false });
 });
 
