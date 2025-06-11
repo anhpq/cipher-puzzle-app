@@ -38,7 +38,7 @@ async function main() {
       {
         stage_number: 2,
         stage_name: "Trạm Mê Cung",
-        description: "Pedro + CTV",
+        description: "Pedro + Kiên",
         open_code: "1510",
         location_image: loadImage("2.png"),
       },
@@ -66,7 +66,7 @@ async function main() {
       {
         stage_number: 6,
         stage_name: "Trạm Cá Sấu",
-        description: "Bryan + Hanah",
+        description: "Bryan + Hana",
         open_code: "6666",
         location_image: loadImage("6.png"),
       },
